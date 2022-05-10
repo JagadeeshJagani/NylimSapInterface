@@ -1,0 +1,32 @@
+﻿  @(Html.Kendo().Grid<NylimSapInterface.Model.Rev2SapWorkflowStatus>()
+    .Name("commentHistoryGrid")
+           .Groupable()
+            .Resizable(resize => resize.Columns(true))
+            .Filterable()
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.Run_Id).Groupable(false).Title("Run Id").Width(80);
+        columns.Bound(p => p.Approved_By).Title("Activity Status").Width(110);
+        columns.Bound(p => p.Comment).Title("Comment").Width(110);
+        columns.Bound(p => p.Reviewed_By).Title("User").Width(110);
+        columns.Bound(p => p.Reviewed_date).Title("Comment Date").Format("{0:MM/dd/yyyy HH:mm:ss}").Width(110);
+    })
+    .DataSource(dataSource => dataSource
+                .Ajax()
+                                 .Model(m =>
+                                 {
+                                     m.Id("Run_Id");
+
+                                 })
+                .ServerOperation(false)
+                    .Read(read => read.Action("GetRev2SapCommentHistory", "RunInterface").Data("common.getRev2SapCommentStatus"))
+    )
+)
+<script type="text/javascript">
+    $(document).ready(function () {
+      
+    });
+
+    var validator = $("#cusipDescEntry").kendoValidator().data("kendoValidator"),
+                    status = $(".status");   
+</script>

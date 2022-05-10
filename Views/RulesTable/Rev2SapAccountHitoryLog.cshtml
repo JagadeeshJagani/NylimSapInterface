@@ -1,0 +1,167 @@
+﻿@{
+    ViewBag.Title = "Rules Table";
+}
+@section featured {
+}
+
+<script type="text/javascript">
+
+    function getSelectedRuleType() {
+        var ddlRuleType = $("#ddlRuleType").data("kendoDropDownList").value();
+        var currentValue = 0;
+        var ddlCalculationGroup = $("#CalculationGroup").data("kendoDropDownList");
+        var dataItemCalculationGroup = ddlCalculationGroup.dataItem(ddlCalculationGroup.selectedIndex);
+        var calCulationGroup = '';
+        calCulationGroup = ddlCalculationGroup._selectedValue;
+        if (ddlRuleType == 'Account Map' || ddlRuleType == '') {
+            currentValue = 0;
+        }
+        else {
+            currentValue = 1;
+        }
+       
+        if (calCulationGroup == 'Please Select') {
+            calCulationGroup = '';
+        }
+        return { ruleType: currentValue, calculationGroup: calCulationGroup };
+    }
+</script>
+<style type="text/css">
+#auditReprotGrid
+{  	
+	width:2500px !important;
+}
+    </style>
+<script id="fileTemplate" type="text/x-kendo-template">
+    <span class='k-progress'></span>
+    <div class='file-wrapper'>        
+        <h6 class='file-heading file-name-heading'>Name: #=name#</h6>        
+        <button type='button' id='btnUploadFile' class='k-upload-action'></button>
+    </div>
+</script>
+ <table style="height: 20px;">
+        <tr>
+            
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="CalculationGroup">
+                  Select Rule Type:</label>
+            </td>
+            <td>@(Html.Kendo().DropDownList()
+                 .Name("ddlRuleType").HtmlAttributes(new { @style = "font-size:12px" })
+                 .DataTextField("Text").OptionLabel("Please Select")
+                 .Events(e => e.Change("common.selectAuditRuleType"))
+             .DataValueField("Value").AutoBind(false)
+               .BindTo((System.Collections.IEnumerable)ViewData["ruleType"])
+                           
+)
+            </td>
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="CalculationGroup" id="lblCalculationGroup">
+                  Calculation Group:</label>
+            </td>
+            <td>@(Html.Kendo().DropDownList()
+             .Name("CalculationGroup").HtmlAttributes(new { @style = "font-size:12px" })
+                 .DataTextField("Calculation_Group")
+                     .DataValueField("Calculation_Group")
+                 .Events(e => e.Change("common.loadAuditReportbuttons"))
+                 .OptionLabel("Please Select") 
+                .DataSource(source =>
+            {
+                source.Read(read =>
+                    {
+                        read.Action("GetCalculationGroup", "RunInterface");
+                    });
+            })
+            ) 
+
+            </td>
+            <td>
+                 <button class="k-button" id="btnSubmit" style="width: 100px;">Submit</button>
+            </td>
+        </tr>
+</table>
+<div id="gridcontentwrapper">
+    @(Html.Kendo().Grid<NylimSapInterface.Model.Rev2SapAccountAudit>()
+    .Name("auditReprotGrid")
+    .Groupable()
+    .Resizable(resize => resize.Columns(true))
+    .Reorderable(reorder => reorder.Columns(true))
+    .Sortable()
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Filterable(f => f.Enabled(true))
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.RecordId).Title("Rule Id").Width(60);
+        columns.Bound(p => p.ActionBy).Title("Action By").Width(60);
+        columns.Bound(p => p.Action).Title("Action").Width(100);
+        columns.Bound(p => p.ActionTime).Title("Action Date").Width(80);
+        columns.Bound(p => p.NewValues).Title("New Data").Width(150);
+        columns.Bound(p => p.OldValues).Title("Old Data").Width(150);
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Template(
+        @<text>
+
+                    <a class="k-button k-button-icontext k-grid-Export" href='#'>
+                        <span>
+                        </span>
+                        <span class=" k-icon k-grid-export-image"/>Export
+                    </a>  
+                       
+            </text>);
+        
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+                .Model(m =>
+                {
+                    m.Id("RecordId");
+                    m.Field(p => p.RecordId).Editable(false);
+                })
+        //.PageSize(40)
+        .ServerOperation(false)
+        .Read(read => read.Action("GetAccountRulesAuditTable", "RulesTable").Data("getSelectedRuleType"))
+    )
+        )
+</div>
+<script type="text/javascript">
+    var securityModel = common.permissionSet;
+    $("#auditReprotGrid").off("click", ".k-grid-Export", common.exportToExcel);
+    $("#auditReprotGrid").on("click", ".k-grid-Export", common.exportToExcel);
+    var test = $('#auditReprotGrid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+
+    $(document).ready(function () {
+        var securityModel = common.permissionSet;
+        if (securityModel.HasREV2SAP_INT_Access || securityModel.HasREV2SAP_EDIT_RULE_Access) {
+            if (securityModel.HasREV2SAP_EDIT_RULE_Access) {
+                $('#auditReprotGrid').find('.k-toolbar .k-button').prop("disabled", false);
+                $(".k-upload-button").prop("disabled", false);
+            }
+            else {
+                $('#auditReprotGrid').find('.k-toolbar .k-button').prop("disabled", true);
+                $(".k-upload-button").prop("disabled", true);
+            }
+        }
+        else {
+            //Select PanelBar Item..
+            var panelBar = $("#panelbar").kendoPanelBar().data("kendoPanelBar");
+            var rootItem = panelBar.element.children("li").eq(0).find(".k-group > .k-item").eq(2);
+            rootItem.find("span").trigger("click");
+        }
+        $('#btnSubmit').hide();
+        $('#auditReprotGrid').hide();
+        $("#lblCalculationGroup").hide();
+        $("#CalculationGroup").closest(".k-widget").hide();
+        $("#btnSubmit").click(common.loadAuditReport);
+    });
+    
+</script>

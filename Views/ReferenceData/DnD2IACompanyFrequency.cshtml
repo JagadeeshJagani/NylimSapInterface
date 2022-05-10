@@ -1,0 +1,159 @@
+﻿@{
+    ViewBag.Title = "Extract Frequency";
+}
+@section featured {
+}
+<script type="text/javascript">
+    function onSave(e) {
+        if (e.model.id != e.model.CompanyCode) {
+            if (!checkDup(this, e.model.CompanyCode)) {
+                alert("Extract Code already exists!");
+                e.preventDefault();
+            }
+        }
+        if (e.container.find('#FrequencyIndicator').val() > 3) {
+
+            alert("Frequency Indicator reached the max value");
+            e.preventDefault();
+        }
+        var SendtoSap = $("#SendtoSap").data("kendoDropDownList").value();
+        e.model.SendtoSap = SendtoSap;        
+    }
+
+    
+
+    function deleteRule() {
+        var myGrid = $('#grid').data("kendoGrid");
+
+        if (myGrid.select().length == 0) {
+            alert("Select record to be removed!");
+            return false;
+        }
+        myGrid.removeRow(myGrid.select());
+    }
+
+    function dataBound(e) {
+        $("#grid").off("click", ".k-grid-Delete", deleteRule);
+        $("#grid").on("click", ".k-grid-Delete", deleteRule);
+    }
+
+    function checkDup(obj, value) {
+        var data = obj.dataSource.data();
+        var invalid = 0;
+        $(data).each(function (i, item) {
+            if (item.id == value) {
+                invalid++;
+            }
+        });
+        if (invalid > 0) {
+            return false;
+        }
+        return true;
+    }
+
+    function RequestEnd(e) {
+        if (e.type == "update" && !e.response.errors) {
+            common.showSuccessMsgSlide("DnD2IA Extract  Frequency Updated Successfully!");
+        }
+        if (e.type == "create" && !e.response.errors) {
+            common.showSuccessMsgSlide("DnD2IA Extract Frequency Created Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+        if (e.type == "destroy" && !e.response.errors) {
+            common.showSuccessMsgSlide("DnD2IA Extract Frequency Removed Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read();
+        }
+    }
+    function onEdit(e) {
+        if (e.model.isNew() == false) {
+            // $("#NewExtractName").hide();
+           // $("#NewExtractName").attr("disabled", "disabled");
+            //$('#NewExtractName').addClass('input-disabled');
+            e.container.find('#NewExtractName').prop("readonly", true);
+            e.container.find('#FrequencyIndicator').prop("readonly", false);
+           // $('#NewExtractName').attr('readonly', 'true'); // mark it as read only
+            e.container.find('#NewExtractName').css('background-color', '#DEDEDE');
+            e.container.find('#FrequencyIndicator').css('background-color', '#fff'); // change the background color
+           // var dropdownlist = $("#CompanyCode").data("kendoDropDownList");
+           // dropdownlist.wrapper.show();            
+        }
+        else {
+           // $("#NewExtractName").show();
+            e.container.find('#NewExtractName').prop("readonly", false);
+            //e.container.find('#NewExtractName').attr('readonly', 'false'); // mark it as read only
+            e.container.find('#NewExtractName').css('background-color', '#fff'); // change the background color
+           // var dropdownlist = $("#CompanyCode").data("kendoDropDownList");
+           // dropdownlist.wrapper.hide(); // call for hide kendo dropdown call  
+            //dropdownlist.enable(true);          
+            e.container.find('#FrequencyIndicator').prop("readonly", false);
+            e.container.find('#FrequencyIndicator').css('background-color', '#fff');            
+        }               
+    }
+</script>
+<div id="contentContainer">
+
+
+
+    <br />
+    <br />
+
+    @(Html.Kendo().Grid<NylimSapInterface.Model.gen2SapCompanyFrequency>()
+        .Name("grid")
+    .Groupable()
+    .Resizable(resize => resize.Columns(true))
+    .Scrollable(scrollable => scrollable.Virtual(true))
+            .Events(e => e.DataBound("dataBound").Save("onSave").Edit("onEdit"))
+    .Editable(e => e.Mode(GridEditMode.PopUp).TemplateName("DnD2IACompanyFrequencyTemplate"))
+    .Sortable()
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Filterable(f => f.Enabled(true))
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.CompanyCode).Groupable(false).Title("Extract Code").Width(80);
+        columns.Bound(p => p.FrequencyIndicator).Width(80);
+        columns.Bound(p => p.SendtoSap).Width(50);
+
+    })
+     .ToolBar(toolbar =>
+    {
+        toolbar.Template(
+            @<text>
+                <a class="k-button k-button-icontext k-grid-add"><span class="k-icon k-add"></span>Create Frequency Indicator</a>
+                @*<a class="k-button k-button-icontext k-grid-Delete" href="#"><span></span>Delete</a>*@
+                <a class="k-button k-button-icontext k-grid-export" href='@Url.Action("DnD2IACompanyFrequencyToExcel", "ReferenceData")'>
+                    <span>
+                    </span>
+                    <span class=" k-icon k-grid-export-image" />Export
+                </a>
+
+            </text>);
+        })
+    //.ToolBar(toolbar => {
+    //    toolbar.Create().Text("Create Frequency Indicator");
+    //    toolbar.Custom().Text("Delete").Name("Delete").Url("#");
+    //})
+    .DataSource(dataSource => dataSource
+        .Ajax()
+                .Model(m =>
+                {
+                    m.Id("CompanyCode");
+                })
+                                .Events(e => e.RequestEnd("RequestEnd"))
+        .Create(update => update.Action("InsertDnD2IACompanyFrequency", "ReferenceData"))
+        .Update(update => update.Action("UpdateDnD2IACompanyFrequency", "ReferenceData"))
+        .Destroy(destroy => destroy.Action("DeleteDnD2IACompanyFrequency", "ReferenceData"))
+        .PageSize(40)
+        .ServerOperation(true)
+            .Read(read => read.Action("GetDnD2IACompanyFrequency", "ReferenceData"))
+    )
+    )
+</div>
+<script type="text/javascript">
+    var securityModel = common.permissionSet;
+    if (securityModel.HasDnD2IA_EDIT_FREQ_Access) {
+        $('#grid').data("kendoGrid").element.delegate("tbody>tr", "dblclick", function () {
+            $('#grid').data("kendoGrid").editRow($(this));
+        });
+    }
+    
+</script>

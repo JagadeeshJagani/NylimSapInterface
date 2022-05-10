@@ -1,0 +1,412 @@
+﻿@{
+    ViewBag.Title = "Run Interface";
+}
+@section featured {
+}
+<script type="text/javascript">
+
+    function companyChanged() {
+        if (document.getElementById("companyList")) {
+            if (document.getElementById("maingrid")) {            
+                onCompanyChanged();
+            }
+            else {
+                $("#grid").data("kendoGrid").dataSource.read();
+            }
+            var ddlcompanyList = $("#companyList").data("kendoDropDownList");
+
+            if (ddlcompanyList.selectedIndex == '2' && $("#selectinterface").data("kendoDropDownList").value() == 4) {
+                $('#updateBiztalk').css("display", "block");
+                $('#lblupdateBiztalk').css("display", "block");
+            }
+            else {
+                $('#updateBiztalk').css("display", "none");
+                $('#lblupdateBiztalk').css("display", "none");
+            }
+        }
+    };
+
+    function companyGroupChanged() {
+        $("#grid").data("kendoGrid").dataSource.read();
+        $("#companyGroupcodeList").data("kendoDropDownList").dataSource.read();
+        var dropdownlist = $("#companyGroupcodeList").data("kendoDropDownList");
+        dropdownlist.selectedIndex == 1;       
+    };
+    
+    
+    function companyChangedLMS() {
+        var ddlcompanyList = $("#companyList").data("kendoDropDownList");
+        var dataItem = ddlcompanyList.dataItem(ddlcompanyList.selectedIndex);
+        var companyName = dataItem.CompanyName;
+
+        if (companyName == 'LMS')
+        {
+            $('#updateBiztalk').css("display", "block");
+            $('#lblupdateBiztalk').css("display", "block");
+        }
+        else 
+        {
+            $('#updateBiztalk').css("display", "none");
+            $('#lblupdateBiztalk').css("display", "none");
+        }
+       
+        if (document.getElementById("companyList")) {
+            if (document.getElementById("maingrid")) {
+                onCompanyChanged();
+            }
+            else {
+                $("#grid").data("kendoGrid").dataSource.read();
+            }
+        }
+    };
+
+    function getSelectedCompanyGroup() {
+        var interfaceId = $("#selectinterface").data("kendoDropDownList").value();
+        if (interfaceId == '2') {
+            var currentValue = $("#companyGroupList").data("kendoDropDownList").value();
+            return { GroupCode: currentValue };
+        }
+        return null;
+    }
+    function getSelectedCompany() {        
+        var stringtoExclude = '@System.Configuration.ConfigurationManager.AppSettings["ListToExclude"].ToString()';
+        var listtoExclude = new Array();
+        listtoExclude = stringtoExclude.split(",");
+        var currentValue = $("#companyList").data("kendoDropDownList").value();
+        var interfaceId = $("#selectinterface").data("kendoDropDownList").value();
+        var filter = $("#Filter").data("kendoDropDownList").value();
+        if (interfaceId == '' || interfaceId == "") {
+            interfaceId = "1";
+        }
+
+        if (interfaceId==1 && inArray(currentValue, listtoExclude) == true) {
+            
+            $('#btnrunInterfaceButton').prop("disabled", true);
+            $('#btnrunInterfaceButton').addClass('k-state-disabled');
+
+        }
+        else {
+
+            $('#btnrunInterfaceButton').prop("disabled", false);
+            $('#btnrunInterfaceButton').removeClass('k-state-disabled');
+
+        }
+        if (interfaceId == 2) {
+            var currentValue = $("#companyGroupList").data("kendoDropDownList").value();
+            $("#btnImportData").prop("disabled", false);
+            $('#btnImportData').removeClass('k-state-disabled');
+        }
+        //if(listtoExclude.contain
+        //alert("Current Value: "+ currentValue);
+        return { companyCode: currentValue, interfaceId: interfaceId, filterValue: filter };
+    }
+    function inArray(value, array) {
+        var length = array.length;
+        for (var i = 0; i < length; i++) {
+            if (array[i] == value)
+                return true;
+           
+                
+        }
+        return false;
+    }
+    function onRunInterface1() {
+        var ddlcompanyList = $("#companyList").data("kendoDropDownList");
+        var dataItem = ddlcompanyList.dataItem(ddlcompanyList.selectedIndex);
+        var interfaceCode = dataItem.InterfaceId;
+        var companyCode = dataItem.CompanyCode;
+        $.get(base_url + 'RunInterface/RunInterfaceByCompany?interfaceId=' + interfaceCode
+            + '&companyCode=' + companyCode, function (data) {
+                //TODO:Display Message Result
+            });
+    }
+    $(document).ready(function () {
+       
+        if (common.permissionSet.length > 0) {
+            common.initLoad(common.permissionSet);
+        }
+    });
+
+    function onCodesDatabound(e) {
+        $("#companyGroupcodeList").data("kendoDropDownList").value("Select All");
+        //console.log("onCodesDatabound : " + document.getElementsByName("cb")[0].checked); 
+    }
+    function onSelect(e) {
+        var checkBox = $(e.item).find('input:checkbox');
+       // var chkstatus = checkBox.is(':checked');
+        if(checkBox.val()=="Select All")
+        {
+            if (checkBox.is(':checked'))
+          {
+              $('.cbComp').prop('checked', true); //.closest('tr').removeClass('k-state-selected')); 
+          }
+          else {
+                $('.cbComp').prop('checked', false);//.closest('tr').removeClass('k-state-selected'));  
+          }
+        }
+        else
+        {
+            if (!checkBox.is(':checked')) {
+                document.getElementsByName("cb")[0].checked = false;
+                }
+        }
+
+        var cbs = document.getElementsByName("cb");
+        var list = [];
+        for (var i = 0; i < cbs.length; i++) {
+            if (cbs[i].checked) {
+                if (cbs[i].value != "Select All")
+                list.push(cbs[i].value);
+            }            
+        }
+
+        if (list.length == cbs.length - 1) {
+            document.getElementsByName("cb")[0].checked = true;           
+        }        
+        e.sender.popup._closing = true;
+        $('.k-animation-container').unbind("mouseleave").bind("mouseleave", function () {
+                    $("#companyGroupcodeList").data("kendoDropDownList").value("Select All");                    
+                    var kendoDropdown = $("#companyGroupcodeList").data("kendoDropDownList");
+                    kendoDropdown.popup._closing = false;
+                    kendoDropdown.close();
+                });                             
+    }
+
+</script>
+<div id="contentContainer">
+    <table style="height: 20px;">
+        <tr>
+         <td id="tbcompanygroup">
+         <table >
+         <tr>
+           <td style="padding-left: 5px;">
+                <label class="category-label" for="companycode">
+                    Select Company Group:</label>
+            </td>
+            <td style="padding-left: 5px;">
+            @(Html.Kendo().DropDownList()
+            .Name("companyGroupList").HtmlAttributes(new { style = "width:200px" })
+            .DataTextField("CompanyGroupName")
+                    .DataValueField("CompanyGroupName")
+                    .Events(e => e.Change("companyGroupChanged").DataBound("companyChanged"))
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                    {
+                        read.Action("GetCompanyGroups", "RunInterface").Data("getSelectedInterface");
+                    });
+            })
+            .CascadeFrom("selectinterface")
+        )
+            </td>
+         <td> @(Html.Kendo().DropDownList()
+.Name("companyGroupcodeList")
+    .HtmlAttributes(new { style = "width:180px" })
+   .DataTextField("CompanyCode")
+.DataValueField("CompanyCode")
+         .Template("<input type='checkbox' name='cb' class='cbComp' checked='false' value='#:data.CompanyCode#' /> #:data.CompanyCode#")
+           // .HeaderTemplate("<input type='checkbox' name='cbselectall' class='selectall' checked='true' value='select All' /> select All")
+
+       .Events(e => e.Select("onSelect").DataBound("onCodesDatabound"))
+    .SelectedIndex(1)
+    .AutoBind(true)
+    .OptionLabel("Select All")
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetGroupCompanyCodeList", "RunInterface").Data("getSelectedCompanyGroup");
+        });
+    }).SelectedIndex(0))   
+     <input type="hidden" id="hdnGroupCompanyCode" />
+     <input type="hidden" id="hdnNullSelectionFlag" value='false' />
+    </td>
+    <td>
+                <button value="2" class="k-button" id="btnImportData" style="width: 100px;">
+                    Import Data</button>                
+            </td>
+    </tr>
+         </table>
+        </td>
+           
+            <td id="tbcompanycode">
+            <table>
+            <tr>
+             <td style="padding-left: 5px;">
+                <label class="category-label" for="companycode">
+                    Select Company Code:</label>
+            </td>
+            <td>
+            @(Html.Kendo().DropDownList()
+            .Name("companyList").HtmlAttributes(new { style = "width:200px" })
+            .DataTextField("CompanyName")
+            .DataValueField("CompanyCode")
+            .Events(e => e.Change("companyChangedLMS").DataBound("companyChanged"))
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                    {
+                        read.Action("GetCompanies", "RunInterface").Data("getSelectedInterface");
+                    });
+            })
+            .CascadeFrom("selectinterface")
+        )
+            </td>
+            </tr></table>
+            
+            </td>
+            <td>
+                <button value="2" class="k-button" id="btnrunInterfaceButton" style="width: 100px;">
+                    Run Interface</button>
+                @*<button class="k-button" id="btnRefreshInterface" style="width: 80px;">
+                    Refresh</button>*@                    
+                
+            </td>
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="getlatest">
+                    Get Latest:</label>
+            </td>
+            <td>@(Html.Kendo().DropDownList()
+             .Name("Filter").HtmlAttributes(new { @style = "font-size:12px" })
+             .DataTextField("Text").OptionLabel("-- Please Select --")
+                 .DataValueField("Value").AutoBind(false)
+                 .BindTo((System.Collections.IEnumerable)ViewData["Filter"])
+                             .Events(e => e.Change("common.filterChanged").DataBound("common.filterChanged"))
+)
+            </td>
+            <td>
+            <a class="k-button k-button-icontext k-grid-Refresh" id="sapGUIrefresh"
+                    href ="#"><span /><span class=" k-icon k-i-refresh" />
+                </a>
+            </td>
+            <td>
+                <input type="checkbox" id="updateBiztalk" name="updateBiztalk" style="display: none;"></input>
+              </td>
+             <td>
+                <label for="updateBiztalk" id="lblupdateBiztalk"
+                            style="display: none;">Is GLUpdate Required?</label>
+             </td>
+        </tr>
+    </table>
+    @(Html.Kendo().Grid<NylimSapInterface.Model.RunStatus>()
+    .Name("grid")
+    .Groupable()
+    .Resizable(resize => resize.Columns(true))
+    .Scrollable(scrollable => scrollable.Virtual(true))
+    .Sortable()
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Filterable()
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.RunId).Groupable(true).Title("Run Id").Width(80);
+       // columns.Bound(p => p.CompanyGroup).Title("Company Group").Width(110);
+       // columns.Bound(p => p.CompanyGroup).Title("Company Group").Width(110).ClientTemplate("#= GetCompanyGroup(CompanyGroup)#");
+        columns.Bound(p => p.Subset).Title("Company Group").Width(110);
+        columns.Bound(p => p.CompanyGroup).Title("Company Code").Width(110);
+        //columns.Bound(p => p.EventDate).Format("{0:MM/dd/yyyy HH:mm:ss}").Title("Event Date").Width(140);
+        columns.Bound(p => p.StartDate).Groupable(true).Format("{0:MM/dd/yyyy HH:mm:ss}").Title("Start Date").Width(140);
+        columns.Bound(p => p.EndDate).Groupable(true).Format("{0:MM/dd/yyyy HH:mm:ss}").Title("End Date").Width(140);
+        columns.Bound(p => p.Status).Title("Status").Width(120);
+        columns.Bound(p => p.Ftp2SapDone).Title("Ftp to Sap").Width(100);
+        columns.Bound(p => p.AckReceived).Title("Ack Received").Width(100);
+        //columns.Bound(p => p.DetailFileName).Title("Detail File Name").Width(150).HtmlAttributes(new { @style = "white-space: nowrap; text-overflow: ellipsis;", @value = "bar" });
+        //columns.Bound(p => p.ControlFileName).Title("Control File Name").Width(150).HtmlAttributes(new { @style = "white-space: nowrap; text-overflow: ellipsis;", @value = "bar" });        
+        columns.Bound(p => p.Message).Title("Message").Width(450).HtmlAttributes(new { @style = "white-space: nowrap; text-overflow: ellipsis;", @value = "bar" });
+        //columns.Bound(p => p.Type).Title("Type").Width(90);
+
+        columns.Bound(p => p.UserName).Title("User Name").Width(100);
+         columns.Bound(p => p.DetailFileName).Title("Detail File").Hidden(true).Width(100).Filterable(false).ClientTemplate("<a class='gridLink' style='cursor: hand;' href='\\#' id='slpitLink'  title='Download Detail File' onclick=\"common.DownloadFile('#:DetailFilepath#'); \">#= DetailFileName == null ? \"\" : DetailFileName #</a>");
+        columns.Bound(p => p.ControlFileName).Title("Control File").Hidden(true).Width(100).Filterable(false).ClientTemplate("<a class='gridLink' style='cursor: hand;' href='\\#' id='slpitLink'  title='Download Control File' onclick=\"common.DownloadFile('#:ControlFilepath#'); return false;\">#= ControlFileName == null ? \"\" : ControlFileName #</a>");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Batch(true)
+        .AutoSync(true)
+        .PageSize(45)
+        .ServerOperation(false)
+        .Read(read => read.Action("GetRunStatusRead", "RunInterface").Data("getSelectedCompany"))
+    )
+)
+</div>
+<script type="text/javascript">
+    function GetCompanyGroup(companygroup) {
+        if (companygroup.split(";").length > 1)
+            return companygroup.split(";")[0];
+        return companygroup;
+    }
+    function GetCompanyCode(companygroup) {
+        if (companygroup.split(";").length > 1)
+            return companygroup.split(";")[1];
+        return companygroup;
+    }
+    var test = $('#grid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+    $(document).ready(function () {
+        $('.cbComp').remove();
+        var grid = $('#grid').data('kendoGrid');
+        $('#tbcompanygroup').css("display", "none");
+        $('#tbcompanycode').css("display", "block");
+        if ($("#selectinterface").data("kendoDropDownList").value() == 4) {
+            //            grid.showColumn(9);
+            //            grid.showColumn(10);
+            grid.showColumn(10);
+            grid.showColumn(11);
+            grid.hideColumn(1);
+            $('#updateBiztalk').css("display", "block");
+            $('#lblupdateBiztalk').css("display", "block");
+        }
+        else {
+            if ($("#selectinterface").data("kendoDropDownList").value() == 2) {
+                //$('#grid').data('kendoGrid').showColumn(9);
+                //$('#grid').data('kendoGrid').showColumn(10);
+                $('#grid').data('kendoGrid').showColumn(1);
+                $('#grid').data('kendoGrid').showColumn(10);
+                $('#grid').data('kendoGrid').showColumn(11);
+                $('#tbcompanygroup').css("display", "block");
+                $('#tbcompanycode').css("display", "none");
+               
+            }
+            else {
+                //$('#grid').data('kendoGrid').hideColumn(9);
+                //$('#grid').data('kendoGrid').hideColumn(10);
+                $('#grid').data('kendoGrid').hideColumn(1);
+                $('#grid').data('kendoGrid').hideColumn(10);
+                $('#grid').data('kendoGrid').hideColumn(11);
+            }
+
+            $('#updateBiztalk').css("display", "none");
+            $('#lblupdateBiztalk').css("display", "none");
+        }
+        $("#sapGUIrefresh").click(common.filterChanged);
+        $("#btnrunInterfaceButton").click(common.onRunInterface);
+        $("#btnImportData").click(function () {
+            var securityModel = common.permissionSet;
+            if (securityModel.HasWSO2SAP_RUN_INT_Access) {
+                if (securityModel.HasWSO2SAP_RUN_INT_Access) {
+                    var interfaceId = $("#selectinterface").data("kendoDropDownList").value();
+                    if (interfaceId == 2) {
+                        var companyGroup = $("#companyGroupList").data("kendoDropDownList").value();
+                        $('.loader').show();
+                        $('.loaderlogo').show();
+                        $.get(base_url + 'RunInterface/WSO2SAPImportData?companyGroup=' + companyGroup, function (data) {
+                            $('.loader').hide();
+                            $('.loaderlogo').hide();
+                            common.showSuccessMsgSlide(data);
+                        });
+                    }
+                }
+                else {
+                    $("#btnImportData").prop("disabled", true);
+                }
+            }
+            
+        });
+    });
+</script>

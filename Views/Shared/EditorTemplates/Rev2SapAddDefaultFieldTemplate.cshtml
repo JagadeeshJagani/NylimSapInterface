@@ -1,0 +1,209 @@
+﻿@model NylimSapInterface.Model.Rev2SapDefaultFields
+
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Calculation_Group)
+</div>
+<div class="editor-field">
+     @(Html.Kendo().ComboBoxFor(model => model.Calculation_Group).HtmlAttributes(new { @style = "font-color:#000; width:50%" })
+                                                      .Name("Calculation_Group")
+                                      .Placeholder("Please Select")
+                                                      .DataTextField("Calculation_Group")
+                                                      .DataValueField("Calculation_Group")
+                                      .Enable(false)
+                                      .HighlightFirst(true)
+            .Filter("startswith")
+                   .DataSource(source =>
+                   {
+                       source.Read(read =>
+                       {
+                           read.Action("GetJEDefaultCalculationGroup", "RunInterface");
+                       });
+                   })
+    )
+    @Html.ValidationMessageFor(model => model.Calculation_Group)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Subset)
+</div>
+<div class="editor-field">
+     @(Html.Kendo().ComboBoxFor(model => model.Subset).HtmlAttributes(new { @style = "font-color:#000; width:50%" })
+                                                              .Name("Subset")
+                                      .Placeholder("Please Select")
+                                                              .DataTextField("Subset")
+                                                              .DataValueField("Subset")
+                                      .Enable(false)
+                                      .HighlightFirst(true)
+            .Filter("startswith")
+                   .DataSource(source =>
+                   {
+                       source.Read(read =>
+                       {
+                           read.Action("GetJEDefaultCalculationGroup", "RunInterface").Data("common.getDefaultCalcData");
+                       });
+                   })
+    )
+    @Html.ValidationMessageFor(model => model.Subset)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.JE_Number)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.JE_Number, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.JE_Number)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.BusinessJE_Explanation)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.BusinessJE_Explanation, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.BusinessJE_Explanation)
+</div>
+
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.BusinessJE_Share_Class)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.BusinessJE_Share_Class, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.BusinessJE_Share_Class)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.SapJE_RefDocument)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.SapJE_RefDocument, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.SapJE_RefDocument)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.SapJE_LineItemtext)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.SapJE_LineItemtext, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.SapJE_LineItemtext)
+</div>
+
+@*<div class="editor-label">
+    @Html.LabelFor(model => model.SapJE_Rps_Product)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.SapJE_Rps_Product, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.SapJE_Rps_Product)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.SapJE_Rps_Subproduct)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.SapJE_Rps_Subproduct, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.SapJE_Rps_Subproduct)
+</div>*@
+@*<div class="editor-label">
+    @Html.LabelFor(model => model.Prepared_By)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.Prepared_By, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.Prepared_By)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Reviewed_By)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.Reviewed_By, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.Reviewed_By)
+</div>
+
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Approved_By)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.Approved_By, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.Approved_By)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Private_Use_Text)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.Private_Use_Text, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.Private_Use_Text)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Batch_Type)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.Batch_Type, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.Batch_Type)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Reverse_Indicator)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.Reverse_Indicator, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.Reverse_Indicator)
+</div>
+<div class="editor-label">
+    @Html.LabelFor(model => model.Cycle_Indicator)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.Cycle_Indicator, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.Cycle_Indicator)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.No_Cycles)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.No_Cycles, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.No_Cycles)
+</div>
+
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Ref_No)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.Ref_No, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.Ref_No)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Post_Date)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.Post_Date, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.Post_Date)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Entd_By)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.Entd_By, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.Entd_By)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Auth_By)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.Auth_By, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.Auth_By)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Document_Header_text)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.Document_Header_text, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.Document_Header_text)
+</div>*@

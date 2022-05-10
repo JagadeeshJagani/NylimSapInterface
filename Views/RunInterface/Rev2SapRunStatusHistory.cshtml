@@ -1,0 +1,73 @@
+﻿  @(Html.Kendo().Grid<NylimSapInterface.Model.Rev2SapWorkflowStatus>()
+    .Name("workflowStatusGrid12")
+           .Groupable()
+            .Resizable(resize => resize.Columns(true))
+            .Events(e => e.DataBound("dataBound"))
+                            .ClientDetailTemplateId("template")
+                              .Events(e => e.Change("common.setailGridChange"))
+            .Filterable()
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.Run_Id).Groupable(false).Title("Run Id").Width(80);
+        columns.Bound(p => p.Approved_By).Title("Activity Status").Width(110);
+        columns.Bound(p => p.Comment).Title("Comment").Width(110);
+        columns.Bound(p => p.Reviewed_By).Title("User").Width(110);
+        columns.Bound(p => p.Reviewed_date).Format("{0:MM/dd/yyyy HH:mm:ss}").Groupable(false);
+        columns.Bound(p => p.Created_Date).Groupable(false).Title("Processed Date").Width(140);
+        columns.Bound(p => p.Created_By).Groupable(false).Title("Processed By").Width(140);
+    })
+    .DataSource(dataSource => dataSource
+                .Ajax()
+                                 .Model(m =>
+                                 {
+                                     m.Id("Run_Id");
+
+                                 })
+                .ServerOperation(false)
+
+                    .Read(read => read.Action("GetRev2SapRunStatus", "RunInterface").Data("common.getRev2SapStatus1"))
+    )
+)
+<script id="template" type="text/kendo-tmpl">
+      @(Html.Kendo().Grid<NylimSapInterface.Model.Rev2SapWorkflowStatus>()
+    .Name("commentHistoryGrid_#=Run_Id#")
+           .Groupable()
+            .Resizable(resize => resize.Columns(true))
+            .Filterable()
+            .Events(ev=>ev.Change("detailGridChange"))
+
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.Approved_By).Title("Activity Status").Width(110);
+        columns.Bound(p => p.Comment).Title("Comment").Width(110);
+        columns.Bound(p => p.Reviewed_By).Title("User").Width(110);
+        columns.Bound(p => p.Reviewed_date).Title("Comment Date").Format("{0:MM/dd/yyyy HH:mm:ss}").Width(110);
+    })
+    .DataSource(dataSource => dataSource
+                .Ajax()
+                                 .Model(m =>
+                                 {
+                                     m.Id("Comment");
+
+                                 })
+                .ServerOperation(false)
+                    .Read(read => read.Action("GetRev2SapCommentHistory", "RunInterface").Data("common.getRev2SapCommentStatus1"))
+    )
+     .Pageable()
+            .Sortable()
+            .ToClientTemplate()
+)
+</script>
+<script>
+    function dataBound(e) {
+
+        this.expandRow(this.tbody.find("tr.k-master-row").first());
+    }
+    function detailGridChange(e) {
+        var parentDataItem = $('#Grid').data().kendoGrid.dataItem($(this.element).closest('.k-detail-row').prev('.k-master-row'));
+        alert(parentDataItem.ID);
+    }
+
+  
+
+</script>

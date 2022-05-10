@@ -1,0 +1,68 @@
+﻿@model NylimSapInterface.Model.Rev2SapCompanySummary
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".k-edit-form-container").removeClass("k-edit-form-container");
+    });
+</script>
+<table>
+    <tr>
+        <td class="editor-label">
+               <label for="GroupName" id="lblGroupName">Calculation Group</label>
+        </td>
+        <td class="editor-field">
+            @(Html.Kendo().DropDownListFor(model => model.Calculation_Group)
+                           .Name("Calculation_Group").HtmlAttributes(new { @style = "font-size:12px" })
+                                             .DataTextField("Calculation_Group")
+                                                  .DataValueField("Calculation_Group")
+                 .OptionLabel("Please Select")
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetCalculationGroup", "RunInterface");
+                    });
+                })
+            ) 
+            @Html.ValidationMessageFor(model => model.Calculation_Group)
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+               <label for="JESubset">JE Subset</label>
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.Subset)
+            @Html.ValidationMessageFor(model => model.Subset)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+        <label for="GroupName" id="lblGroupName">JE Type</label>
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.JE_Type)
+            @Html.ValidationMessageFor(model => model.JE_Type)
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+    </tr>
+      <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.Description)
+        </td>
+        <td class="editor-field">
+            @Html.TextAreaFor(model => model.Description, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.Description)
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+    </tr>
+</table>

@@ -1,0 +1,237 @@
+﻿@{
+    ViewBag.Title = "Intermediary-Fee Type Map";
+}
+@section featured {
+}
+<style type="text/css">
+.k-invalid-msg
+{
+    style: margin-left : 10em;
+}
+</style>
+<script type="text/javascript">
+    function deleteRule() {
+        var myGrid = $('#grid').data("kendoGrid");
+
+        if (myGrid.select().length == 0) {
+            alert("Select record to be removed!");
+            return false;
+        }
+        myGrid.removeRow(myGrid.select());
+    }
+
+    function dataBound(e) {
+        $("#grid").off("click", ".k-grid-Delete", deleteRule);
+        $("#grid").on("click", ".k-grid-Delete", deleteRule);
+    }
+
+
+    function onRev2SapRequestEnd(e) {
+        if (e.type == "update" && !e.response.errors) {
+            common.showSuccessMsgSlide("Rev2Sap Account Rule Updated Successfully!");
+        }
+        if (e.type == "create" && !e.response.errors) {
+            common.showSuccessMsgSlide("Rev2Sap Account Rule Created Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+        if (e.type == "destroy" && !e.response.errors) {
+            common.showSuccessMsgSlide("Rev2Sap Account Rule Deleted Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+    }
+
+
+</script>
+
+<table style="height: 20px;">
+        <tr>
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="CalculationGroup">Calculation Group: </label>
+             </td>
+              <td>
+                 @(Html.Kendo().DropDownList()
+                   .Name("GroupName").HtmlAttributes(new { @style = "font-size:12px" })
+                             .DataTextField("Calculation_Group")
+                             .DataValueField("Calculation_Group")
+                     .OptionLabel("Please Select")
+                     .Events(e => e.Change("common.loadintermediaryData"))
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetCalculationGroup", "RunInterface");
+                        });
+                    })
+                  ) 
+            </td>
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="JESubset">
+                  JE Subset: </label>
+            </td>
+            <td>
+            @(Html.Kendo().DropDownList()
+                         .Name("JESubset").HtmlAttributes(new { style = "width:120px" })
+                          .DataTextField("Subset")
+                          .DataValueField("Subset")
+                          .OptionLabel("Please Select")
+                          .Events(e => e.Change("common.clearintermediaryData"))
+                          .AutoBind(false)
+                  ) 
+            </td>
+           
+     <td style="padding-left: 5px;">
+                <label class="category-label" for="Intermediary">
+                  Intermediary: </label>
+            </td>
+            <td>
+               @(Html.Kendo().ComboBox()
+                    .Name("Intermediary")
+                    .HtmlAttributes(new { style = "width:130px" })
+                    .DataTextField("Intermediary")
+                    .DataValueField("Intermediary")
+                    .SelectedIndex(0)
+                    .Placeholder("Please Select")
+                    .Template("<input type='checkbox' name='cbIntermediary' value='#:data.Intermediary#' /> #:data.Intermediary#")
+                    .Events(e => e.Select("common.onIntermediarySelect").Change("common.loadFeeTypeData"))
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetRev2SapIntermediary", "RulesTable").Data("common.getIntermediaryData");
+                        });
+                    }))
+ 
+            </td>
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="Fee_Type">Fee Type: </label>
+                </td>
+                <td>
+              @(Html.Kendo().ComboBox()
+                    .Name("Fee_Type")
+                    .HtmlAttributes(new { style = "width:130px" })
+                    .DataTextField("Fee_Type")
+                    .DataValueField("Fee_Type")
+                    .SelectedIndex(0)
+                    .Placeholder("Please Select")
+                    .Template("<input type='checkbox' name='cbFeeType' value='#:data.Fee_Type#' /> #:data.Fee_Type#")
+                    .Events(e => e.Select("common.onFeeTypeSelect"))
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetRev2SapFeeType", "RulesTable").Data("common.getFeeTypeData");
+                        });
+                    }))
+            </td>
+              <td>
+                <button value="2" class="k-button" id="btnFilterAccountDetail" style="width: 150px;">
+                    Filter Intermediary-Fee Type Map</button>
+                
+            </td>
+             <td style="vertical-align:bottom;">
+            <a class="k-button k-button-icontext k-grid-Refresh" id="sapGUIAccountRefresh"
+                    href ="#"><span /><span class=" k-icon k-i-refresh" />
+                </a>
+            </td>
+          </tr>
+</table>
+<div id="gridcontentwrapper">
+    @(Html.Kendo().Grid<NylimSapInterface.Model.Rev2SapAccountRules>()
+        .Name("grid")
+    .Groupable()
+    .Resizable(resize => resize.Columns(true))
+    .Events(e => e.DataBound("dataBound"))
+    .Sortable()
+    .Reorderable(reorder => reorder.Columns(true))
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Filterable(f => f.Enabled(true))
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.RuleId).Visible(false).Title("Rule Id").Width(60).Groupable(true);
+        columns.Bound(p => p.Calculation_Group).Title("Calculation Group").Width(60).Groupable(true);
+        columns.Bound(p => p.Subset).Title("JE Subset").Width(100).Groupable(true);
+        columns.Bound(p => p.JE_Type).Title("JE Type").Width(100).Groupable(true);
+        columns.Bound(p => p.Intermediary).Title("Intermediary").Width(80).Groupable(true);
+        columns.Bound(p => p.Fee_Type).Title("Fee Type").Width(80).Groupable(true);
+        columns.Bound(p => p.alloc_perc).Title("Mapped").Width(60).Groupable(true);
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Template(
+        @<text>
+                    <a class="k-button k-button-icontext k-grid-Export" href='#'>
+                        <span>
+                        </span>
+                        <span class=" k-icon k-grid-export-image"/>Export
+                    </a>  
+                       
+            </text>);
+        
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+                .Model(m =>
+                {
+                     m.Id("RuleId");
+                    m.Field(p => p.RuleId).Editable(false);
+                })
+                .Events(e => e.RequestEnd("onRev2SapRequestEnd"))
+                                
+        //.PageSize(40)
+       // .ServerOperation(false)
+                .Read(read => read.Action("GetAccountDetailRules", "RulesTable").Data("common.getAccountDetailData"))
+    )
+)
+<div id="modalRev2SapAccountWindow">
+</div>
+</div>
+<script type="text/javascript">
+    var securityModel = common.permissionSet;
+    if (securityModel.HasREV2SAP_EDIT_RULE_Access) {
+        $('#grid').data("kendoGrid").element.delegate("tbody>tr", "dblclick", function () {
+            $('#grid').data("kendoGrid").editRow($(this));
+        });
+
+    }
+    $("#grid").off("click", ".k-grid-Export", common.exportAccountIntermediaryToExcel);
+    $("#grid").on("click", ".k-grid-Export", common.exportAccountIntermediaryToExcel);
+    $("#sapGUIAccountRefresh").click(common.loadAccountDetailGrid);
+    var test = $('#grid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+
+    $(document).ready(function () {
+        var securityModel = common.permissionSet;
+        if (common.accountIntermediary != undefined) {
+            common.accountIntermediary = '';
+            common.accountFeeType = '';
+        }
+        if (securityModel.HasREV2SAP_INT_Access || securityModel.HasREV2SAP_EDIT_RULE_Access) {
+            if (securityModel.HasREV2SAP_EDIT_RULE_Access) {
+                $('#grid').find('.k-toolbar .k-button').prop("disabled", false);
+                $(".k-upload-button").prop("disabled", false);
+            }
+            else {
+                $('#grid').find('.k-toolbar .k-button').prop("disabled", true);
+                $(".k-upload-button").prop("disabled", true);
+            }
+        }
+        else {
+            //Select PanelBar Item..
+            var panelBar = $("#panelbar").kendoPanelBar().data("kendoPanelBar");
+            var rootItem = panelBar.element.children("li").eq(0).find(".k-group > .k-item").eq(2);
+            rootItem.find("span").trigger("click");
+        }
+
+        $("#btnFilterAccountDetail").click(common.loadAccountDetailGrid);
+        $("#grid").off("dblclick", "tbody tr", common.openAccountDetailMap);
+        $("#grid").on("dblclick", "tbody tr", common.openAccountDetailMap);
+    });
+    
+</script>

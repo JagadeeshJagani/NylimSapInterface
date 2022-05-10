@@ -1,0 +1,182 @@
+﻿@{
+    ViewBag.Title = "Rules Table";
+}
+@section featured {
+}
+<script type="text/javascript">
+        var isCustomAdd = false;
+         function deleteRule() {
+            var myGrid = $('#grid').data("kendoGrid");
+
+            if (myGrid.select().length == 0) {
+                alert("Select record to be removed!");
+                return false;
+            }
+            myGrid.removeRow(myGrid.select());
+        }
+
+        function addNewCustomRow() {
+            common.customRowDataItem = '';
+            var myGrid = $("#grid").data("kendoGrid");
+            myGrid.select().each(function () {
+                common.customRowDataItem = myGrid.dataItem($(this));
+                isCustomAdd = true;
+            });
+            myGrid.addRow();
+        }
+
+        function dataBound(e) {
+            $("#grid").off("click", ".k-grid-Delete", deleteRule);
+            $("#grid").on("click", ".k-grid-Delete", deleteRule);
+        }
+
+        function onRequestEnd(e) {
+            if (e.type == "update" && !e.response.errors) {
+                common.showSuccessMsgSlide("Rei2Sap Rule Updated Successfully!");
+            }
+            if (e.type == "create" && !e.response.errors) {
+                common.customRowDataItem = '';
+                common.showSuccessMsgSlide("Rei2Sap Rule Created Successfully!");
+                $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+            }
+            if (e.type == "destroy" && !e.response.errors) {
+                common.showSuccessMsgSlide("Rei2Sap Rule Deleted Successfully!");
+                $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+            }
+        }
+
+        function onEdit(e) {
+       if (isCustomAdd && e.model.isNew()) {
+           isCustomAdd = false;
+           //set the values of the pop up editor fields
+           (e.container).find("[name='Type']").val(common.customRowDataItem.Type);
+           $(e.container).find("[name='GroupName']").val(common.customRowDataItem.GroupName);
+           $(e.container).find("[name='Portfolio']").val(common.customRowDataItem.Portfolio);
+           $(e.container).find("[name='participant']").val(common.customRowDataItem.participant);
+           $(e.container).find("[name='Ca_cc']").val(common.customRowDataItem.Ca_cc);
+           $(e.container).find("[name='DebitOrCredit']").val(common.customRowDataItem.DebitOrCredit);
+           $(e.container).find("[name='CompanyCode']").val(common.customRowDataItem.CompanyCode);
+           $(e.container).find("[name='GlAccount']").val(common.customRowDataItem.GlAccount);
+           $(e.container).find("[name='SAPAccountName']").val(common.customRowDataItem.SAPAccountName);
+           $(e.container).find("[name='PoolProfitCenter']").val(common.customRowDataItem.PoolProfitCenter);
+           $(e.container).find("[name='ProfitCenter']").val(common.customRowDataItem.ProfitCenter);
+           $(e.container).find("[name='TransactionType']").val(common.customRowDataItem.TransactionType);
+           $(e.container).find("[name='CurrentSapRefCode']").val(common.customRowDataItem.CurrentSapRefCode);
+           $(e.container).find("[name='NewSapRefCode']").val(common.customRowDataItem.NewSapRefCode);
+       }
+       else {
+           common.customRowDataItem = '';
+       }
+}
+</script>
+<script id="fileTemplate" type="text/x-kendo-template">
+    <span class='k-progress'></span>
+    <div class='file-wrapper'>        
+        <h6 class='file-heading file-name-heading'>Name: #=name#</h6>        
+        <button type='button' id='btnUploadFile' class='k-upload-action'></button>
+    </div>
+</script>
+<div id="gridcontentwrapper">
+    @(Html.Kendo().Grid<NylimSapInterface.Model.Rei2SapRules>()
+        .Name("grid")
+    .Groupable()
+    .Resizable(resize => resize.Columns(true))
+    .Scrollable(scrollable => scrollable.Virtual(true))//.HtmlAttributes(new { @style="height:500px;"  })
+            .Events(e => e.DataBound("dataBound").Edit("onEdit"))
+    .Editable(e => e.Mode(GridEditMode.PopUp).TemplateName("Rei2SapRulesTemplate"))
+    .Sortable()
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Filterable(f => f.Enabled(true))
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.RuleId).Title("Rule Id").Width(60);
+        columns.Bound(p => p.Type).Title("Type").Width(60);
+        columns.Bound(p => p.GroupName).Title("Group Name").Width(100);
+        columns.Bound(p => p.Portfolio).Title("Portfolio").Width(80);
+        columns.Bound(p => p.participant).Title("Participant").Width(80);
+        columns.Bound(p => p.Ca_cc).Title("CA/CC").Width(60);
+        columns.Bound(p => p.DebitOrCredit).Title("Debit Or Credit").Width(100);
+        columns.Bound(p => p.CompanyCode).Title("Company Code").Width(100);
+        columns.Bound(p => p.GlAccount).Title("Gl Account").Width(80);
+        columns.Bound(p => p.SAPAccountName).Title("SAP Account Name").Width(120);
+        columns.Bound(p => p.PoolProfitCenter).Title("Pool Profit Center").Width(120);
+        columns.Bound(p => p.ProfitCenter).Title("Profit Center").Width(100);
+        columns.Bound(p => p.TransactionType).Title("Transaction Type").Width(110);
+        columns.Bound(p => p.CurrentSapRefCode).Title("CurrentSapRefCode").Width(120);
+        columns.Bound(p => p.NewSapRefCode).Title("NewSapRefCode").Width(110);        
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Create().Text("Create Rule");
+        toolbar.Custom().Text("Delete").Name("Delete").Url("#");
+        toolbar.Template(
+        @<text>
+                    <a class="k-button k-button-icontext k-grid-add" ><span class="k-icon k-add"></span>Create Rule</a>
+                    <a class="k-button k-button-icontext k-grid-Delete" href="#"><span></span>Delete</a>
+                      <a class="k-button k-button-icontext k-grid-clone" onclick="addNewCustomRow();" href="#"><span></span>Clone Rule</a>
+                    <a class="k-button k-button-icontext k-grid-Export" href='#'>
+                        <span>
+                        </span>
+                        <span class=" k-icon k-grid-export-image"/>Export
+                    </a>  
+                       
+            </text>);
+        
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+                .Model(m =>
+                {
+                    m.Id("RuleId");
+                    m.Field(p => p.RuleId).Editable(false);
+                    m.Field(p => p.RecordAction).Editable(false);
+                })
+        .Events(e => e.RequestEnd("onRequestEnd"))
+                    .Create(update => update.Action("SaveRei2SapRules", "RulesTable").Data("common.getReiCloneData"))
+                    .Update(update => update.Action("UpdateRei2SapRules", "RulesTable"))
+                    .Destroy(destroy => destroy.Action("DeleteRei2SapRules", "RulesTable"))
+        //.PageSize(40)
+        .ServerOperation(true)
+        .Read(read => read.Action("GetRulesTable", "RulesTable").Data("getSelectedInterface"))
+    )
+)
+</div>
+<script type="text/javascript">
+    var securityModel = common.permissionSet;
+    if (securityModel.HasREI2SAP_EDIT_RULE_Access) {
+        $('#grid').data("kendoGrid").element.delegate("tbody>tr", "dblclick", function () {
+            $('#grid').data("kendoGrid").editRow($(this));
+        });
+    }
+    $("#grid").off("click", ".k-grid-Export", common.exportToExcel);
+    $("#grid").on("click", ".k-grid-Export", common.exportToExcel);
+    var test = $('#grid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+
+    $(document).ready(function () {
+        var securityModel = common.permissionSet;
+        if (securityModel.HasREI2SAP_INT_Access || securityModel.HasREI2SAP_EDIT_RULE_Access) {
+            if (securityModel.HasREI2SAP_EDIT_RULE_Access) {
+                $('#grid').find('.k-toolbar .k-button').prop("disabled", false);
+                $(".k-upload-button").prop("disabled", false);
+            }
+            else {
+                $('#grid').find('.k-toolbar .k-button').prop("disabled", true);
+                $(".k-upload-button").prop("disabled", true);
+            }
+        }
+        else {
+            //Select PanelBar Item..
+            var panelBar = $("#panelbar").kendoPanelBar().data("kendoPanelBar");
+            var rootItem = panelBar.element.children("li").eq(0).find(".k-group > .k-item").eq(2);
+            rootItem.find("span").trigger("click");
+        }
+    });  
+</script>

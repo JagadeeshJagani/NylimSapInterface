@@ -1,0 +1,275 @@
+﻿
+@{
+    ViewBag.Title = "Rules Table";
+}
+@section featured {
+}
+<style scoped>
+    .k-edit-form-container
+    {
+        width:845px !important;
+    }    
+</style>
+<script type="text/javascript">
+    function entityFilter(element) {
+        element.kendoDropDownList({
+            dataSource: {
+                transport: {
+                    read: '@Url.Action("GetExa2SapRulesEntity", "RulesTable")'
+                }
+            },
+            optionLabel: "--Select Value--"
+        });
+    }
+    function deleteRule() {
+        var myGrid = $('#grid').data("kendoGrid");
+        if (myGrid.select().length == 0) {
+            alert("Select record to be removed!");
+            return false;
+        }
+        myGrid.removeRow(myGrid.select());
+    }
+    function dataBound(e) {
+        $("#grid").off("click", ".k-grid-Delete", deleteRule);
+        $("#grid").on("click", ".k-grid-Delete", deleteRule);
+    }
+    function onRequestEnd(e) {
+        if (e.type == "update" && !e.response.errors) {
+            common.showSuccessMsgSlide("Exa2Sap Rule Updated Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+        if (e.type == "create" && !e.response.errors) {
+            common.showSuccessMsgSlide("Exa2Sap Rule Created Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+        if (e.type == "destroy" && !e.response.errors) {
+            common.showSuccessMsgSlide("Exa2Sap Rule Removed Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+    }
+    function onSave(e) {
+        var currentRuleId = e.model.RuleId;
+        var currentCountry = e.model.Country;
+        var currentSapAccount = e.model.SapAccount;
+        var currentSourceAccount = e.model.SourceAccount;
+        var currentPartner = e.model.Partner;
+        var data = $("#grid").data("kendoGrid").dataSource.data();
+        var invalid = 0;
+        if (currentCountry == "") {
+            currentCountry = null;
+        }
+        if (currentSourceAccount == "") {
+            currentSourceAccount = null;
+
+        }
+        if (currentPartner == "") {
+            currentPartner = null;
+        }
+        if (currentSapAccount == "") {
+            currentSapAccount = null;
+        }
+
+        $(data).each(function (i, item) {
+            if (e.model.isNew() == true) {
+                if (item.id > 0) {
+                    if (item.Country == currentCountry) {
+                        if (item.SourceAccount == currentSourceAccount) {
+                            if (item.Partner == currentPartner) {
+                                invalid++;
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                if (item.RuleId != currentRuleId) {
+                    if (item.Country == currentCountry) {
+                        if (item.SourceAccount == currentSourceAccount) {
+                            if (item.Partner == currentPartner) {
+                                invalid++;
+                            }
+                        }
+                    }
+                }
+            }
+
+        });
+        if (invalid > 0) {
+            e.preventDefault();
+            alert("Sap account already exists for the combination of country, source account and partner!");
+        }
+
+    }
+
+
+
+    function onEdit(e) {
+        if (e.model.isNew() == false) {
+            //e.container.find('#SapAccount').prop("readonly", true);
+
+        }
+    }
+</script>
+<script id="fileTemplate" type="text/x-kendo-template">
+    <span class='k-progress'></span>
+    <div class='file-wrapper'>        
+        <h6 class='file-heading file-name-heading'>Name: #=name#</h6>        
+        <button type='button' id='btnUploadFile' class='k-upload-action'></button>
+    </div>
+</script>
+
+<div id="gridcontentwrapper">
+            <table style="display:none">   <tr>         
+                            <td style="width:300px;">   
+            @(Html.Kendo().Upload()
+            .Name("rulesTableUpload")
+            .Events(e => e.Upload("common.onUpload").Success("common.onUploadSuccess").Error("common.onUploadError"))
+            //.TemplateId("fileTemplate")
+            .Multiple(false)
+            .Messages( m => m.Select("Select File..").StatusUploaded("File Successfully uploaded!"))
+            .Async(a => a
+                .Save("ImportRulesData", "RulesTable")
+                .Remove("RemoveImportedRulesData", "RulesTable")
+                .AutoUpload(false)
+            )
+
+            )
+            </td>
+            <td>
+            <input type="checkbox" id="clearAllData" name="clearAllData" title="Clear all data prior import"
+                        checked="checked" value="Clear All Data"></input><label for="clearAllData"
+                            style="display: inline-block;">&nbsp;Clear All Data</label>
+                            </td>
+            </tr>
+            </table>
+ 
+   
+
+@*<script type="text/x-kendo-template" id="template">
+    <div class="toolbar">
+        <a class="k-button k-button-icontext k-grid-add" href="/SapGuiInterface/RulesTable/GetRulesTable?grid-mode=insert"><span class="k-icon k-add"></span>Create Rule</a>
+        <a class="k-button k-button-icontext k-grid-Delete" href="#"><span></span>Delete</a>
+        @Html.ActionLink("Export to Excel", "Exa2SapRulesToExcel", "RulesTable")  
+    </div>
+</script>
+  
+*@
+@(Html.Kendo().Grid<NylimSapInterface.Model.Exa2SapRules>()
+        .Name("grid")
+    .Groupable()    
+    .Resizable(resize => resize.Columns(true))
+    .Scrollable(scrollable => scrollable.Virtual(true))
+    .Sortable()
+  .Events(e => e.DataBound("dataBound").Save("onSave").Edit("onEdit"))
+    .Editable(e => e.Mode(GridEditMode.PopUp).TemplateName("Exa2SapRulesTemplate"))
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .StartsWith("Starts with")
+                .IsEqualTo("Is equal to")
+                .IsNotEqualTo("Is not equal to")
+            ))
+    )
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.Country).Title("Country").Width(100);
+        columns.Bound(p => p.SourceAccount).Title("Source Account").Width(110);
+        columns.Bound(p => p.Partner).Title("Source Partner").Width(100);
+        columns.Bound(p => p.SourceAccountDescEnglish).Title("Source Account Desc (English)").Width(175);
+        columns.Bound(p => p.SourceAccountDescFrench).Title("Source Account Desc (French)").Width(175);
+        columns.Bound(p => p.SapAccount).Title("SAP Account").Width(90);
+        columns.Bound(p => p.SapAccountDesc).Title("SAP Account Desc").Width(120);
+        columns.Bound(p => p.SAPTradingPartnerCode).Title("SAP Trading Partner Code").Width(190);
+        columns.Bound(p => p.ProductCode).Title("SAP Product Code").Width(110);
+        columns.Bound(p => p.SubProductCode).Title("SAP Sub Product Code").Width(130);
+        columns.Bound(p => p.SapOrderNo).Title("SAP Internal Order No").Width(130);
+        columns.Bound(p => p.SourceProductCode).Title("Source Product Code").Width(145);
+        columns.Bound(p => p.DistributionChannelCode).Title("Distribution Channel Code").Width(155);
+        columns.Bound(p => p.GLDocumentType).Title("GL Document Type").Width(135);
+        columns.Bound(p => p.LedgerGroupCode).Title("Ledger Group Code").Width(135);
+        //columns.Bound(p => p.PremiumLoadType).Title("Premium Load Type").Width(135);
+        //columns.Bound(p => p.PolicyRiderType).Title("Policy Rider Type").Width(135);
+        //columns.Bound(p => p.SeparateAccountSeriesCode).Title("Separate Account Series Code").Width(175);
+        columns.Bound(p => p.StateCode).Title("State Code").Width(95);
+        columns.Bound(p => p.SourceInvestmentDivisionCode).Title("Investment Division Code").Width(190);
+        columns.Bound(p => p.QualifiedNonQualifiedIndicator).Title("Qualified/Non-Qualified Indicator").Width(190);
+        columns.Bound(p => p.RuleId).Hidden(true);
+        columns.Bound(p => p.Rownum).Width(80); 
+    })
+    .ToolBar(toolbar =>
+    {
+        //toolbar.Create().Text("Create Rule");
+        //toolbar.Custom().Text("Delete").Name("Delete").Url("#");
+        toolbar.Template(
+            @<text>
+                    <a class="k-button k-button-icontext k-grid-add" href="/SapGuiInterface/RulesTable/GetRulesTable?grid-mode=insert"><span class="k-icon k-add"></span>Create Rule</a>
+                    <a class="k-button k-button-icontext k-grid-Delete" href="#"><span></span>Delete</a>
+                    <a class="k-button k-button-icontext k-grid-Export" href='#'>
+                        <span>
+                        </span>
+                        <span class=" k-icon k-grid-export-image"/>Export
+                    </a>  
+                </text>);
+        })
+    .DataSource(dataSource => dataSource
+            .Ajax()
+                    .Model(m =>
+                    {
+                        m.Id(i=>i.RuleId);
+                        m.Field(p => p.RuleId).Editable(false);
+                        m.Field(p => p.RecordAction).Editable(false);
+                    })       
+        .PageSize(45)
+        .ServerOperation(false)
+        //.Model(m => m.Id("Rownum"))
+        .Events(e => e.RequestEnd("onRequestEnd"))
+        .Create(create => create.Action("SaveExa2SapRules", "RulesTable"))
+        .Update(update => update.Action("UpdateExa2SapRules", "RulesTable"))
+        .Destroy(destroy => destroy.Action("DeleteExa2SapRules", "RulesTable"))
+        .Read(read => read.Action("GetRulesTable", "RulesTable").Data("getSelectedInterface"))
+    )
+)
+</div>
+<script type="text/javascript">
+    var securityModel = common.permissionSet;
+    if (securityModel.HasEXA2SAP_EDIT_RULE_Access) {
+        $('#grid').data("kendoGrid").element.delegate("tbody>tr", "dblclick", function () {
+            $('#grid').data("kendoGrid").editRow($(this));
+        });
+    }
+
+    $("#grid").off("click", ".k-grid-Delete", deleteRule);
+    $("#grid").on("click", ".k-grid-Delete", deleteRule);
+    $("#grid").off("click", ".k-grid-Export", common.exportToExcel);
+    $("#grid").on("click", ".k-grid-Export", common.exportToExcel);
+    var test = $('#grid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+    $(document).ready(function () {
+        var securityModel = common.permissionSet;
+        if (securityModel.HasEXA2SAP_INT_Access || securityModel.HasEXA2SAP_EDIT_RULE_Access) {
+            if (securityModel.HasEXA2SAP_EDIT_RULE_Access) {
+                $('#grid').find('.k-toolbar .k-button').prop("disabled", false);
+                $(".k-upload-button").prop("disabled", false);
+            }
+            else {
+                $('#grid').find('.k-toolbar .k-button').prop("disabled", true);
+                $(".k-upload-button").prop("disabled", true);
+            }
+        }
+        else {
+            //Select PanelBar Item..
+            var panelBar = $("#panelbar").kendoPanelBar().data("kendoPanelBar");
+            var rootItem = panelBar.element.children("li").eq(0).find(".k-group > .k-item").eq(2);
+            rootItem.find("span").trigger("click");
+        }
+    });
+</script>

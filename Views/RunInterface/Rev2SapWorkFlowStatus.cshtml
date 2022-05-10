@@ -1,0 +1,83 @@
+﻿   <style>
+
+</style>
+  @(Html.Kendo().Grid<NylimSapInterface.Model.Rev2SapWorkflowStatus>()
+    .Name("workflowStatusGrid")
+           .Groupable()
+            .Resizable(resize => resize.Columns(true))
+            .Reorderable(reorder => reorder.Columns(true))
+                  .Events(e => e.DataBound("common.onworkflowStatusGridload"))
+            .Filterable()
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.Run_Id).Groupable(false).Title("Run Id").Width(80);
+        columns.Bound(p => p.Approved_By).Title("Activity Status").Width(105);
+        columns.Bound(p => p.Comment).Title("Comment").Width(105);
+        columns.Bound(p => p.Reviewed_By).Title("User").Width(110);
+        columns.Bound(p => p.Reviewed_date).Format("{0:MM/dd/yyyy HH:mm:ss}").Groupable(false);
+        columns.Bound(p => p.Created_Date).Groupable(false).Title("Processed Date").Width(135);
+        columns.Bound(p => p.Created_By).Groupable(false).Title("Processed By").Width(135);
+    })
+    .DataSource(dataSource => dataSource
+                .Ajax()
+                                 .Model(m =>
+                                 {
+                                     m.Id("Run_Id");
+
+                                 })
+                .ServerOperation(false)
+              .Read(read => read.Action("GetRev2SapRunStatus", "RunInterface").Data("common.getRev2SapStatus"))
+    )
+)
+   <ul id="updateMemoOtherCash" class="centerUL">
+    <li>
+        <textarea id="txtRejectApproveReason" class="k-input" name="Reason" rows="3" cols="3" style="text-align:left;"/>
+        <input type="hidden" id="rtype" />
+    </li>   
+    
+    <li style="text-align: center;" >
+        <button class="k-button" id="btnRev2SapApprove" style="width:55px;" style="text-align:left;">
+            Approve</button>
+         <button class="k-button" id="btnRev2SapSendApprove" style="width:125px;" style="text-align:left;">
+            Send for Approval</button>
+        <button class="k-button" id="btnRev2SapApproveReject" style="width:50px;" style="text-align:left;">
+            Reject</button>
+             <button class="k-button" id="btnRev2SapReProcess" style="width:80px;" style="text-align:left;">
+            Re-Process</button>
+        <button class="k-button" id="btnRev2SapApproveCancel" style="width:50px;" style="text-align:left;">
+            Cancel</button>
+    </li>
+</ul>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnRev2SapApprove").click(function () {
+            common.approveSelectedTransactionWithReason(common.rev2sapRow);
+            //            var wdialog = $("#modalRev2SapWindow").data("kendoWindow");
+            //            wdialog.close();
+        });
+
+        $("#btnRev2SapApproveCancel").click(function () {
+            var wdialog = $("#modalRev2SapWindow").data("kendoWindow");
+            wdialog.close();
+        });
+
+        $("#btnRev2SapApproveReject").click(function (e) {
+            common.rejectSelectedTransactionWithReason(common.rev2sapRow);
+            //            var wdialog = $("#modalRev2SapWindow").data("kendoWindow");
+            //            wdialog.close();
+        });
+        $("#btnRev2SapSendApprove").click(function (e) {
+            common.sendSelectedTransactionForApproval(common.rev2sapRow);
+            //            var wdialog = $("#modalRev2SapWindow").data("kendoWindow");
+            //            wdialog.close();
+        });
+        $("#btnRev2SapReProcess").click(function (e) {
+            common.sendSelectedTransactionForReProcess(common.rev2sapRow);
+            //            var wdialog = $("#modalRev2SapWindow").data("kendoWindow");
+            //            wdialog.close();
+        });
+    });
+
+    var validator = $("#cusipDescEntry").kendoValidator().data("kendoValidator"),
+                    status = $(".status");   
+</script>

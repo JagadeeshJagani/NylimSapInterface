@@ -1,0 +1,93 @@
+﻿@model NylimSapInterface.Model.Rev2SapCompanyFrequency
+        <div class="editor-label">
+               <label for="GroupName" id="lblGroupName">Calculation Group</label>
+        </div>
+        <div class="editor-field">
+            @(Html.Kendo().DropDownListFor(model => model.GroupName)
+                   .Name("GroupName").HtmlAttributes(new { @style = "font-size:12px" })
+                   .DataTextField("Calculation_Group")
+                           .DataValueField("Calculation_Group")
+                  .Events(e => e.Change("common.loadJESubsetType"))
+                 .OptionLabel("Please Select")
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetCalculationGroup", "RunInterface");
+                    });
+                })
+            ) 
+            @Html.ValidationMessageFor(model => model.GroupName)
+        </div>
+        <div class="editor-label">
+               <label for="JESubset">JE Subset</label>
+        </div>
+        <div class="editor-field">
+         @(Html.Kendo().DropDownListFor(model => model.JESubset)
+                  .Name("JESubset")
+                  .OptionLabel("Please Select")
+                  .DataTextField("Subset")
+                  .DataValueField("Subset")
+                  .Events(e => e.Change("common.loadJEType"))
+                   .DataSource(source =>
+                   {
+                       source.Read(read =>
+                       {
+                           read.Action("GetAllSubSets", "RunInterface").Data("common.getCalgrpDataa");
+                       });
+                   })
+    )
+            @Html.ValidationMessageFor(model => model.JESubset)
+        </div>
+@*<div class="editor-label">
+    @Html.LabelFor(model => model.JESubset)
+</div>
+<div class="editor-field">
+ @(Html.Kendo().DropDownListFor(model => model.JESubset)
+                  .Name("JEType")
+                  .
+                  .OptionLabel("Please Select")
+                       .DataTextField("JESubset")
+                        .DataValueField("JESubset")
+                   .DataSource(source =>
+                   {
+                       source.Read(read =>
+                       {
+                           read.Action("GetAllSubSets", "RunInterface");
+                       });
+                   })
+    )
+  @Html.ValidationMessageFor(model => model.JESubset)
+</div>*@
+@*<div>
+<div class="editor-label">
+    @Html.LabelFor(model => model.CompanyGroup)
+</div>
+<div class="editor-field">
+ @(Html.Kendo().DropDownListFor(model => model.CompanyGroup)
+                  .Name("CompanyGroup")
+                  .OptionLabel("Please Select")
+                  .Enable(false)
+                  .
+                  .DataTextField("CompanyGroup")
+                  .DataValueField("CompanyGroup")
+                   .DataSource(source =>
+                   {
+                       source.Read(read =>
+                       {
+                           read.Action("GetAllCompanyCode", "ReferenceData").Data("common.getJETypeData");
+                       });
+                   })
+    )
+  @Html.ValidationMessageFor(model => model.CompanyGroup)
+</div>
+</tr>*@
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.FrequencyIndicator)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.FrequencyIndicator, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.FrequencyIndicator)
+</div>
+

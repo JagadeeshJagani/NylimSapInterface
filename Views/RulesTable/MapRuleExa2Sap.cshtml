@@ -1,0 +1,339 @@
+﻿<script type="text/javascript">
+    function entityFilter(element) {
+        element.kendoDropDownList({
+            dataSource: {
+                transport: {
+                    read: '@Url.Action("GetExa2SapRulesEntity", "RulesTable")'
+                }
+            },
+            optionLabel: "--Select Value--"
+        });
+    }
+    function onCompanyChanged() {
+        if ($("#maingrid").data("kendoGrid")) {
+            $("#maingrid").data("kendoGrid").dataSource.read();
+        }
+        if ($("#childgrid").data("kendoGrid")) {
+            $("#childgrid").data("kendoGrid").dataSource.read();
+        }
+    };
+
+    function getSelectedCompany() {
+        var currentValue = $("#companyList").data("kendoDropDownList").value();
+        var interfaceId = $("#selectinterface").data("kendoDropDownList").value();
+        return { companyCode: currentValue };
+    }
+    function getSelectedRows(gridid) {
+        var grid = $("#" + gridid).data("kendoGrid");
+        var selection = [];
+
+        grid.select().each(function () {
+            var dataItem = grid.dataItem($(this));
+
+            selection.push(dataItem);
+        });
+        return selection;
+    }
+
+    function saveMapping() {
+
+        if ($("#maingrid").data("kendoGrid").select().length <= 0) {
+            alert(" Select at least one item to be added!");
+            return false;
+        }
+        SubmitChages(true, false);
+
+    }
+    function saveAllMapping() {
+        if ($("#maingrid").data("kendoGrid").dataSource.total() <= 0) {
+            alert(" Select at least one item to be added!");
+            return false;
+        }
+        SubmitChages(true, true);
+    }
+    function removeMapping() {
+
+        if ($("#childgrid").data("kendoGrid").select().length <= 0) {
+            alert(" Select at least one item to be removed from mapping!");
+            return false;
+        }
+        SubmitChages(false, false);
+    }
+    function removeAllMapping() {
+        if ($("#childgrid").data("kendoGrid").dataSource.total() <= 0) {
+            alert(" Select at least one item to be removed from mapping!");
+            return false;
+        }
+        SubmitChages(false, true);
+    }
+    function SubmitChages(isAdd, isAll) {
+        var selection;
+        if (isAll) {
+            if (isAdd) {
+                selection = $("#maingrid").data("kendoGrid").dataSource.data();
+            }
+            else {
+                selection = $("#childgrid").data("kendoGrid").dataSource.data();
+            }
+        }
+        else {
+            selection = isAdd ? getSelectedRows("maingrid") : getSelectedRows("childgrid");
+        }
+
+        var companyCd = $("#companyList").data("kendoDropDownList").value();
+        $.ajax({
+            type: "POST",
+            url: base_url + "RulesTable/SaveWsoRuleCompanyMapping",
+            data: JSON.stringify({ rulesCompany: selection, companyCode: companyCd, IsAdd: isAdd }),
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (form) {
+
+            },
+            statusCode: {
+                201: function (result) {
+                    $("#maingrid").data("kendoGrid").dataSource.read();
+                    $("#childgrid").data("kendoGrid").dataSource.read();
+                    if (isAdd) {
+                        common.showSuccessMsgSlide("Selected Rule(s) mapped to Company!");
+                    }
+                    else {
+                        common.showSuccessMsgSlide("Selected Rule(s) removed from Company Mapping!");
+                    }
+                },
+                500: function (result) {
+                }
+            }
+        });
+    }
+    function clearGridSelection() {
+        $("#maingrid").data("kendoGrid").clearSelection();
+        $("#childgrid").data("kendoGrid").clearSelection();
+    }
+    $(document).ready(function () {
+        $("#btnMoveAllToApplied").click(saveAllMapping);
+        $("#btnMoveSelectedToApplied").click(saveMapping);
+        $("#btnMoveAllToAvailable").click(removeAllMapping);
+        $("#btnMoveSelectedToAvailable").click(removeMapping);
+        $("#btnClearSelection").click(clearGridSelection);
+    });    
+</script>
+<div id="contentContainer">
+    <table style="height: 20px;">
+        <tr>
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="companycode">
+                    Select Company Code:</label>
+            </td>
+            <td>@(Html.Kendo().DropDownList()
+                .Name("companyList").HtmlAttributes(new { style = "width:200px" })
+            .DataTextField("CompanyName")
+            .DataValueField("CompanyCode")
+            .Events(e => e.Change("companyChanged").DataBound("onCompanyChanged"))
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                    {
+                        read.Action("GetCompanies", "RunInterface").Data("getSelectedInterface");
+                    });
+            })
+            .CascadeFrom("selectinterface")
+        )
+            </td>
+        </tr>
+    </table>
+    <div id="mappingContainer" style="width: 99%;">
+        <div style="float: left; width: 40%; height: 98%;padding-left:5px;">
+            <label class="category-label">
+                Available Rules:</label>
+            @(Html.Kendo().Grid<NylimSapInterface.Model.Exa2SapRules>()
+            .Name("maingrid")
+            .Groupable(g => g.Enabled(false))            
+            .Resizable(resize => resize.Columns(true))            
+            .Scrollable(scrollable => scrollable.Virtual(true))
+            .Sortable()
+            .Selectable(selectable => selectable.Mode(GridSelectionMode.Multiple))
+            .Filterable(filterable => filterable
+                .Extra(false)
+                .Operators(operators => operators
+                    .ForString(str => str.Clear()
+                        .StartsWith("Starts with")
+                        .IsEqualTo("Is equal to")
+                        .IsNotEqualTo("Is not equal to")
+                    ))
+            ) 
+            .Columns(columns =>
+            {
+                columns.Bound(p => p.Country).Title("Country").Width(100);
+                columns.Bound(p => p.SourceAccount).Title("Source Account").Width(110);
+                columns.Bound(p => p.Partner).Title("Source Partner").Width(100);
+                columns.Bound(p => p.SourceAccountDescEnglish).Title("Source Account Desc (English)").Width(175);
+                columns.Bound(p => p.SourceAccountDescFrench).Title("Source Account Desc (French)").Width(175);
+                columns.Bound(p => p.SapAccount).Title("SAP Account").Width(90);
+                columns.Bound(p => p.SapAccountDesc).Title("SAP Account Desc").Width(120);
+                columns.Bound(p => p.SAPTradingPartnerCode).Title("SAP Trading Partner Code").Width(190);
+                columns.Bound(p => p.ProductCode).Title("SAP Product Code").Width(110);
+                columns.Bound(p => p.SubProductCode).Title("SAP Sub Product Code").Width(130);
+                columns.Bound(p => p.SapOrderNo).Title("SAP Internal Order No").Width(130);
+                columns.Bound(p => p.SourceProductCode).Title("Source Product Code").Width(145);
+                columns.Bound(p => p.DistributionChannelCode).Title("Distribution Channel Code").Width(155);
+                columns.Bound(p => p.GLDocumentType).Title("GL Document Type").Width(135);
+                columns.Bound(p => p.LedgerGroupCode).Title("Ledger Group Code").Width(135);
+                //columns.Bound(p => p.PremiumLoadType).Title("Premium Load Type").Width(135);
+                //columns.Bound(p => p.PolicyRiderType).Title("Policy Rider Type").Width(135);
+                //columns.Bound(p => p.SeparateAccountSeriesCode).Title("Separate Account Series Code").Width(175);
+                columns.Bound(p => p.StateCode).Title("State Code").Width(95);
+                columns.Bound(p => p.SourceInvestmentDivisionCode).Title("Investment Division Code").Width(190);
+                columns.Bound(p => p.QualifiedNonQualifiedIndicator).Title("Qualified/Non-Qualified Indicator").Width(190);
+                columns.Bound(p => p.RuleId).Hidden(true);
+                columns.Bound(p => p.Rownum).Width(80);  
+            })
+            .DataSource(dataSource => dataSource
+                .Ajax()                                
+                .ServerOperation(false)
+                .PageSize(45)
+                .Read(read => read.Action("GetAvailableExa2SapRules", "RulesTable").Data("getSelectedCompany"))
+            )
+            )
+        </div>
+        <div style="text-align: center; float: left; width: 10%; padding: 20% 2% 30% 2%;">
+            <table>
+                <tr>
+                    <td>
+                        <button value="2" title="Map All Rules" class="k-button" id="btnMoveAllToApplied"
+                            style="width: 80px;">
+                            >>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button value="2" title="Map Selected Rules" class="k-button" id="btnMoveSelectedToApplied"
+                            style="width: 80px;">
+                            >
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button value="2" title="Remove Mapping for All Rules" class="k-button" id="btnMoveAllToAvailable"
+                            style="width: 80px;">
+                            <<
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button value="2" title="Remove Mapping for Selected Rules" class="k-button" id="btnMoveSelectedToAvailable"
+                            style="width: 80px;">
+                            <
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button value="2" title="Clear Selection" class="k-button" id="btnClearSelection"
+                            style="width: 80px;">
+                            Clear
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="float: left; width: 40%; height: 98%;">
+            <label class="category-label">
+                Applied Rules:</label>
+            @(Html.Kendo().Grid<NylimSapInterface.Model.Exa2SapRules>()
+    .Name("childgrid")
+    .Groupable(g => g.Enabled(false))
+    .Resizable(resize => resize.Columns(true))    
+    .Scrollable(scrollable => scrollable.Virtual(true))
+    .Sortable()
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Multiple))
+    .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .StartsWith("Starts with")
+                .IsEqualTo("Is equal to")
+                .IsNotEqualTo("Is not equal to")
+            ))
+    ) 
+    .Columns(columns =>
+    {
+
+        columns.Bound(p => p.Country).Title("Country").Width(100);
+        columns.Bound(p => p.SourceAccount).Title("Source Account").Width(110);
+        columns.Bound(p => p.Partner).Title("Source Partner").Width(100);
+        columns.Bound(p => p.SourceAccountDescEnglish).Title("Source Account Desc (English)").Width(175);
+        columns.Bound(p => p.SourceAccountDescFrench).Title("Source Account Desc (French)").Width(175);
+        columns.Bound(p => p.SapAccount).Title("SAP Account").Width(90);
+        columns.Bound(p => p.SapAccountDesc).Title("SAP Account Desc").Width(120);
+        columns.Bound(p => p.SAPTradingPartnerCode).Title("SAP Trading Partner Code").Width(190);
+        columns.Bound(p => p.ProductCode).Title("SAP Product Code").Width(110);
+        columns.Bound(p => p.SubProductCode).Title("SAP Sub Product Code").Width(130);
+        columns.Bound(p => p.SapOrderNo).Title("SAP Internal Order No").Width(130);
+        columns.Bound(p => p.SourceProductCode).Title("Source Product Code").Width(145);
+        columns.Bound(p => p.DistributionChannelCode).Title("Distribution Channel Code").Width(155);
+        columns.Bound(p => p.GLDocumentType).Title("GL Document Type").Width(135);
+        columns.Bound(p => p.LedgerGroupCode).Title("Ledger Group Code").Width(135);
+        //columns.Bound(p => p.PremiumLoadType).Title("Premium Load Type").Width(135);
+        //columns.Bound(p => p.PolicyRiderType).Title("Policy Rider Type").Width(135);
+        //columns.Bound(p => p.SeparateAccountSeriesCode).Title("Separate Account Series Code").Width(175);
+        columns.Bound(p => p.StateCode).Title("State Code").Width(95);
+        columns.Bound(p => p.SourceInvestmentDivisionCode).Title("Investment Division Code").Width(190);
+        columns.Bound(p => p.QualifiedNonQualifiedIndicator).Title("Qualified/Non-Qualified Indicator").Width(190);
+        columns.Bound(p => p.RuleId).Hidden(true);
+        columns.Bound(p => p.Rownum).Width(80); 
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .PageSize(45)
+        .ServerOperation(false)
+        .Read(read => read.Action("GetAppliedExa2SapRules", "RulesTable").Data("getSelectedCompany"))
+    )
+    )
+        </div>
+        <br style="clear: left;" />
+    </div>
+</div>
+<script type="text/javascript">
+
+    var test = $('#childgrid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+
+    var test = $('#maingrid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+
+
+    $(document).ready(function () {
+        var securityModel = common.permissionSet;
+        if (securityModel.HasWSO2SAP_INT_Access || securityModel.HasWSO2SAP_EDIT_RULE_Access) {
+            if (securityModel.HasWSO2SAP_EDIT_RULE_Access) {
+                $(".k-button").prop("disabled", false);
+            }
+            else {
+                $(".k-button").prop("disabled", true);
+            }
+        }
+        else {
+            //Select PanelBar Item..
+            //Display No Access message Page
+        }
+    });
+      
+</script>

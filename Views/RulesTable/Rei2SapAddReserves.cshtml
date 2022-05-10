@@ -1,0 +1,203 @@
+﻿@{
+    ViewBag.Title = "Add Reserves";
+}
+@section featured {
+}
+<script type="text/javascript">
+    function onRequestEnd(e) {
+        if (e.type == "create" && !e.response.errors) {
+            common.showSuccessMsgSlide("Rei2Sap Basis Point Added Successfully!");
+            $("#reservesGrid").data("kendoGrid").dataSource.read();
+        }
+        else if (e.type == "update" && !e.response.errors) {
+            common.showSuccessMsgSlide("Rei2Sap Basis Point Updated Successfully!");
+            $("#reservesGrid").data("kendoGrid").dataSource.read();
+        }
+    }
+
+    function refreshGridData() {
+        $("#reservesGrid").data("kendoGrid").dataSource.read();
+    }
+
+    $(document).ready(function () {
+        if (common.permissionSet.length > 0) {
+            common.initLoad(common.permissionSet);
+        }
+    });
+    function onEdit(e) {
+        if (e.model.isNew() == false) {
+            var dropDown = $("#GroupName").data("kendoComboBox");
+            dropDown.enable(false);
+            //e.container.find('#GroupName').prop("readonly", true);
+        }
+    }
+</script>
+<div id="contentContainer">
+    @(Html.Kendo().Grid<NylimSapInterface.Model.Rei2SapBasisPoints>()
+    .Name("reservesGrid")
+    .Groupable()
+    .Resizable(resize => resize.Columns(true))
+    .Events(e => e.Edit("onEdit"))
+    .Editable(e => e.Mode(GridEditMode.PopUp).TemplateName("Rei2SapAddBasisPointTemplate"))
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Filterable()
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.GroupName).Groupable(false).Title("GroupName").Width(80);
+        columns.Bound(p => p.BasisPoint).Title("BasisPoint").Width(110);
+        columns.Bound(p => p.DollarAmount).Title("DollarAmount").Width(110);
+    })
+      .ToolBar(toolbar =>
+    {
+        toolbar.Template(
+            @<text>
+                    <a class="k-button k-button-icontext k-grid-add"><span class="k-icon k-add"></span>Add ProfitCenter</a>
+                    <a class="k-button k-button-icontext k-grid-Export" href='#'>
+                        <span>
+                        </span>
+                        <span class=" k-icon k-grid-export-image"/>Export
+                    </a>
+                    <a class="k-button k-button-icontext k-grid-Refresh"
+                    href ="#"><span /><span class=" k-icon k-i-refresh" />
+                </a>
+            </text>);
+        })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+                 .Model(m =>
+                 {
+                     m.Id("GroupName");
+                   
+                 })
+        .Create(update => update.Action("SaveRei2SapReserveBasisPoint", "RulesTable"))
+        .Events(e => e.RequestEnd("onRequestEnd"))
+        .ServerOperation(false)
+        .Read(read => read.Action("GetReservesBasispoint", "RulesTable"))
+        .Update(update => update.Action("UpdateRei2SapReserveBasisPoint", "RulesTable"))
+        .Destroy(destroy => destroy.Action("EditingCustomValidation_Cancel", "reservesGrid"))
+
+    )
+)
+</div>
+<script type="text/javascript">
+    var test = $('#reservesGrid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+    var securityModel = common.permissionSet;
+    if (securityModel.HasREI2SAP_EDIT_RULE_Access) {
+        $('#reservesGrid').data("kendoGrid").element.delegate("tbody>tr", "dblclick", function () {
+            $('#reservesGrid').data("kendoGrid").editRow($(this));
+        });
+    }
+    $("#reservesGrid").off("click", ".k-grid-Export", common.exportToExcel);
+    $("#reservesGrid").on("click", ".k-grid-Export", common.exportToExcel);
+    $("#reservesGrid").off("click", ".k-grid-Refresh", refreshGridData);
+    $("#reservesGrid").on("click", ".k-grid-Refresh", refreshGridData);
+    $(document).ready(function () {
+        var grid = $('#reservesGrid').data('kendoGrid');
+    });
+    //register custom validation rules
+    (function ($, kendo) {
+    var starBasisPoint='';
+    var strDollarAmount='';
+    var cnt=0;
+    var stCategory='';
+    var strGroupName='';
+        $.extend(true, kendo.ui.validator, {
+            rules: { // custom rules
+                basispointvalidation: function (input, params) {
+                    //check for the rule attribute 
+                    var container = $(input).closest("tr"); 
+                    if ((input.is("[name='BasisPoint']")) || (input.is("[name='DollarAmount']")) || (input.is("[name='GroupName']")) )
+                    {
+                        if (input.is("[name='BasisPoint']")) {
+                            starBasisPoint = container.find("input[name=BasisPoint]").prevObject.prevObject[0].value;
+                        }
+                        else if (input.is("[name='DollarAmount']")) {
+                            strDollarAmount = container.find("input[name=DollarAmount]").prevObject.prevObject[0].value;
+                        }
+                        else if (input.is("[name='GroupName']")) {
+                            strGroupName = container.find("input[name=GroupName]").prevObject.prevObject[0].value;
+                        }
+                        if (input.selector=='' && (input[0].name == 'BasisPoint' || input[0].name == 'DollarAmount'))
+                        {
+                            if (starBasisPoint != '' && strDollarAmount != '')
+                            {
+                               return false;
+                            }
+                            else  if (starBasisPoint == '' && strDollarAmount == '')
+                            {
+                               return false;
+                            }
+                            else{
+                               return true;
+                            }
+                        }
+                        if (input.selector != ':input[data-bind="value:BasisPoint"]' && input.selector != ':input[data-bind="value:DollarAmount"]' && input.selector != ':input[data-bind="value:GroupName"]') {
+                            if ((starBasisPoint != '' && strDollarAmount != '') || (starBasisPoint == '' && strDollarAmount == '')) {
+                                cnt = cnt + 1;
+                                if (cnt == 1 && (strGroupName != '' && strGroupName != 'Select GroupName')) {
+                                } 
+                                
+                                else if   (input.is("[name='GroupName']") && input.selector =='' && strGroupName != '' && strGroupName != 'Select GroupName')
+                                {
+                                   return true;
+                                }
+                                else {
+                                    if (cnt == 3) {
+                                        starBasisPoint = '';
+                                        strDollarAmount = '';
+                                        cnt = 0;
+                                        strGroupName = '';
+                                    }
+                                    return false;
+                                }
+                            }
+
+                        }
+                        return true;
+                    }
+                    else
+                    {
+                      return true
+                    }             
+                }
+            },
+            messages: { //custom rules messages
+                basispointvalidation: function (input) {
+                    // return the message text
+                    if (input[0].name == 'GroupName')
+                    {
+                      return "Please select GroupName";
+                    }
+                    else if (input[0].name == 'BasisPoint' || input[0].name == 'DollarAmount')
+                    {
+                      return "You have to enter either Basis Point or Dollar Amount";
+                    }
+                }
+            }
+        });
+    })(jQuery, kendo);
+
+    //show server errors if any
+    function error_handler(e) {
+        if (e.errors) {
+            var message = "Errors:\n";
+            $.each(e.errors, function (key, value) {
+                if ('errors' in value) {
+                    $.each(value.errors, function () {
+                        message += this + "\n";
+                    });
+                }
+            });
+            alert(message);
+        }
+    }
+
+</script>

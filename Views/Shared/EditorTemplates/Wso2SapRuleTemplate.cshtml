@@ -1,0 +1,324 @@
+﻿@model NylimSapInterface.Model.Wso2SapRules
+@Html.HiddenFor(model => model.Rownum)
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".k-edit-form-container").removeClass("k-edit-form-container");
+    });
+</script>
+
+<table style="padding: 1%">
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.Entity)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.Entity)
+            @Html.ValidationMessageFor(model => model.Entity)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.Subsystem)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.Subsystem)
+            @Html.ValidationMessageFor(model => model.Subsystem)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.Identification)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.Identification)
+            @Html.ValidationMessageFor(model => model.Identification)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.PostDate)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.PostDate)
+            @Html.ValidationMessageFor(model => model.PostDate)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.JournalDate)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.JournalDate)
+            @Html.ValidationMessageFor(model => model.JournalDate)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.CostCenter)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.CostCenter)
+            @Html.ValidationMessageFor(model => model.CostCenter)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.StateCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.StateCode)
+            @Html.ValidationMessageFor(model => model.StateCode)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.InvestmentDivision)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.InvestmentDivision)
+            @Html.ValidationMessageFor(model => model.InvestmentDivision)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.ProfitCenter)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.ProfitCenter)
+            @Html.ValidationMessageFor(model => model.ProfitCenter)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.InsuranceDesignationSeries)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.InsuranceDesignationSeries)
+            @Html.ValidationMessageFor(model => model.InsuranceDesignationSeries)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.TaxIndicator)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.TaxIndicator)
+            @Html.ValidationMessageFor(model => model.TaxIndicator)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.IntOrderCd)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.IntOrderCd)
+            @Html.ValidationMessageFor(model => model.IntOrderCd)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.WsoLedger)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.WsoLedger)
+            @Html.ValidationMessageFor(model => model.WsoLedger)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.ExplanationOfTransaction)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.ExplanationOfTransaction)
+            @Html.ValidationMessageFor(model => model.ExplanationOfTransaction)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.PortfolioName)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.PortfolioName)
+            @Html.ValidationMessageFor(model => model.PortfolioName)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.AssetClass)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.AssetClass)
+            @Html.ValidationMessageFor(model => model.AssetClass)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.TrancashName)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.TrancashName)
+            @Html.ValidationMessageFor(model => model.TrancashName)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.IssuerName)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.IssuerName)
+            @Html.ValidationMessageFor(model => model.IssuerName)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.CreditDebit1)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.CreditDebit1)
+            @Html.ValidationMessageFor(model => model.CreditDebit1)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.Scale)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.Scale)
+            @Html.ValidationMessageFor(model => model.Scale)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.Account)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.Account)
+            @Html.ValidationMessageFor(model => model.Account)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.AccountName)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.AccountName)
+            @Html.ValidationMessageFor(model => model.AccountName)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.CreditDebit2)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.CreditDebit2)
+            @Html.ValidationMessageFor(model => model.CreditDebit2)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.OffsetAcct)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.OffsetAcct)
+            @Html.ValidationMessageFor(model => model.OffsetAcct)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.OffsetAcctName)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.OffsetAcctName)
+            @Html.ValidationMessageFor(model => model.OffsetAcctName)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SapDescription)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SapDescription)
+            @Html.ValidationMessageFor(model => model.SapDescription)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.CompanyCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.CompanyCode)
+            @Html.ValidationMessageFor(model => model.CompanyCode)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.Tab)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.Tab)
+            @Html.ValidationMessageFor(model => model.Tab)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.DistributionChannelCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.DistributionChannelCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.DistributionChannelCode)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.LedgerGroupCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.LedgerGroupCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.LedgerGroupCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.GLDocumentType)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.GLDocumentType, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.GLDocumentType)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.PremiumLoadType)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.PremiumLoadType, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.PremiumLoadType)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.PolicyRiderType)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.PolicyRiderType, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.PolicyRiderType)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SeparateAccountSeriesCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SeparateAccountSeriesCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.SeparateAccountSeriesCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SourceProductCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SourceProductCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.SourceProductCode)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SourceInvestmentDivisionCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SourceInvestmentDivisionCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.SourceInvestmentDivisionCode)
+        </td>
+    </tr>
+    
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.TradePartnerCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.TradePartnerCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.TradePartnerCode)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.ProductCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.ProductCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.ProductCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SubProductCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SubProductCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.SubProductCode)
+        </td>
+    </tr>
+</table>

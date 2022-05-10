@@ -1,0 +1,146 @@
+﻿
+@{
+    ViewBag.Title = "Fund Grouping Table";
+}
+@section featured {
+}
+<script type="text/javascript">
+//    function deleteRule() {
+//        var myGrid = $('#grid').data("kendoGrid");
+
+//        if (myGrid.select().length == 0) {
+//            alert("Select record to be removed!");
+//            return false;
+//        }
+//        myGrid.removeRow(myGrid.select());
+//    }
+//    function dataBound(e) {
+//        $("#grid").off("click", ".k-grid-Delete", deleteRule);
+//        $("#grid").on("click", ".k-grid-Delete", deleteRule);
+//    }
+    function onRequestEnd(e) {
+        if (e.type == "update" && !e.response.errors) {
+            common.showSuccessMsgSlide("Wso2Sap Fund Grouping Table Updated Successfully!");
+        }
+        if (e.type == "create" && !e.response.errors) {
+            common.showSuccessMsgSlide("Wso2Sap Fund Grouping Table Created Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read();
+        }
+        if (e.type == "destroy" && !e.response.errors) {
+            common.showSuccessMsgSlide("Wso2Sap Fund Grouping Table Removed Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read();
+        }
+    }
+    function onSave(e) {
+//        alert(e.model.CompanyCode);
+//        alert(e.model.CompanyGroup);
+//        alert($("#CompanyGroupName").data("kendoDropDownList").value());
+        e.model.CompanyGroup = $("#CompanyGroupName").data("kendoDropDownList").value();
+        if (e.model.id != e.model.CompanyCode) {
+            if (!checkDup(this, e.model.CompanyCode)) {
+                alert("CompanyCode already exists!");
+                e.preventDefault();
+            }
+        }
+    }
+    function checkDup(obj, value) {
+        var data = obj.dataSource.data();
+        var invalid = 0;
+        $(data).each(function (i, item) {
+            if (item.id == value) {
+                invalid++;
+            }
+        });
+        if (invalid > 0) {
+            return false;
+        }
+        return true;
+    }
+    function onEdit(e) {
+         $("#CompanyGroupName").data('kendoDropDownList').value(e.model.CompanyGroup);
+        //alert($("#CompanyGroupName").data("kendoDropDownList").value());
+//        dropdownlist.select(e.model.CompanyGroup);
+        //$("#CompanyGroupName").data("kendoDropDownList").value() = e.model.CompanyGroup;
+       // e.container.find('.k-numerictextbox').width(100);
+        if (e.model.isNew() == false) {
+            e.container.find('#CompanyCode').prop("readonly", true);
+        }
+    }
+
+</script>
+<div id="contentContainer">
+
+
+    @(Html.Kendo().Grid<NylimSapInterface.Model.FundGroupMapping>()
+        .Name("grid")
+    .Groupable()
+    .Resizable(resize => resize.Columns(true))
+    .Scrollable(scrollable => scrollable.Virtual(true))
+    .Events(e => e.DataBound("dataBound").Save("onSave").Edit("onEdit"))
+    .Editable(e => e.Mode(GridEditMode.PopUp).TemplateName("MapFundGroupWso2sapTemplate"))
+    .Sortable()
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Filterable(f => f.Enabled(true))
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.CompanyCode).Groupable(false).Width(80);
+        columns.Bound(p => p.CompanyGroup).Width(80);
+
+    })
+     .ToolBar(toolbar =>
+     {
+         toolbar.Template(
+            @<text>
+                @*<a class="k-button k-button-icontext k-grid-add" href="/SapGuiInterface/RulesTable/GetFundGroupWso2sap?grid-mode=insert"><span class="k-icon k-add"></span>Create Company Code</a>*@
+                @* <a class="k-button k-button-icontext k-grid-Delete" href="#"><span></span>Delete</a>*@
+                <a class="k-button k-button-icontext k-grid-export" href='@Url.Action("FundGroupWso2sapToExcel", "RulesTable")'>
+                    <span></span><span class=" k-icon k-grid-export-image" />Export
+                </a>
+
+            </text>);
+     })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+                .Model(m =>
+                {
+                    m.Id("CompanyCode");
+                })
+        .Events(e => e.RequestEnd("onRequestEnd"))
+        .Create(update => update.Action("SaveFundGroupWso2sap", "RulesTable"))
+        .Update(update => update.Action("UpdateFundGroupWso2sap", "RulesTable"))
+        //.Destroy(destroy => destroy.Action("DeleteFundGroupWso2sap", "RulesTable"))
+        .PageSize(40)
+        .ServerOperation(true)
+        .Read(read => read.Action("GetFundGroupWso2sap", "RulesTable"))
+    )
+    )
+</div>
+<script type="text/javascript">
+    var securityModel = common.permissionSet;
+    if (securityModel.HasWSO2SAP_EDIT_RULE_Access) {
+        $('#grid').data("kendoGrid").element.delegate("tbody>tr", "dblclick", function () {
+            $('#grid').data("kendoGrid").editRow($(this));
+        });
+    }
+//    $("#grid").off("click", ".k-grid-Delete", deleteRule);
+//    $("#grid").on("click", ".k-grid-Delete", deleteRule);
+     $(document).ready(function () {
+        /*var securityModel = common.permissionSet;
+        if (securityModel.HasIVT2SAP_INT_Access || securityModel.HasIVT2SAP_EDIT_RULE_Access) {
+        if (securityModel.HasIVT2SAP_EDIT_RULE_Access) {
+        $('#grid').find('.k-toolbar .k-button').prop("disabled", false);
+        $(".k-upload-button").prop("disabled", false);
+        }
+        else {
+        $('#grid').find('.k-toolbar .k-button').prop("disabled", true);
+        $(".k-upload-button").prop("disabled", true);
+        }
+        }
+        else {
+        //Select PanelBar Item..
+        var panelBar = $("#panelbar").kendoPanelBar().data("kendoPanelBar");
+        var rootItem = panelBar.element.children("li").eq(0).find(".k-group > .k-item").eq(2);
+        rootItem.find("span").trigger("click");
+        }*/
+    });
+</script>

@@ -1,0 +1,88 @@
+﻿@model NylimSapInterface.Model.Gen2SapCompanySummary
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".k-edit-form-container").removeClass("k-edit-form-container");
+    });
+</script>
+<table>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.CompanyCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.CompanyCode)
+            @Html.ValidationMessageFor(model => model.CompanyCode)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.CompanyGroup)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.CompanyGroup)
+            @Html.ValidationMessageFor(model => model.CompanyGroup)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SapProfitCenter)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SapProfitCenter)
+            @Html.ValidationMessageFor(model => model.SapProfitCenter)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.PoolProfitCenter)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.PoolProfitCenter)
+            @Html.ValidationMessageFor(model => model.PoolProfitCenter)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SapCostCenter)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SapCostCenter)
+            @Html.ValidationMessageFor(model => model.SapCostCenter)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SendToSapAuto)
+        </td>
+        <td class="editor-field">
+            @(Html.Kendo().DropDownList()
+    .Name("SendToSapAuto")
+    .Value("SendToSapAuto")
+            .OptionLabel("Please Select")
+    .BindTo(new string[] { "Y", "N" }))
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SubSystemCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SubSystemCode)
+            @Html.ValidationMessageFor(model => model.SubSystemCode)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SAPInterfaceCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SAPInterfaceCode)
+            @Html.ValidationMessageFor(model => model.SAPInterfaceCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.Description)
+        </td>
+        <td class="editor-field">
+            @Html.TextAreaFor(model => model.Description, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.Description)
+        </td>
+        <td>
+        </td>
+        <td>
+        </td>
+    </tr>
+</table>

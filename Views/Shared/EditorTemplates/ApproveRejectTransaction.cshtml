@@ -1,0 +1,26 @@
+﻿
+@{
+    ViewBag.Title = "Approve/Reject Reason";
+}
+
+<ul id="updateMemoOtherCash">
+    <li>
+        <label>
+            Comment:</label>
+        <textarea id="txtRejectApproveReason" class="k-input" name="Reason" rows="3" cols="10" style="padding-left:0.3em;"/>
+        <input type="hidden" id="rtype" />
+    </li>    
+    <li style="text-align: left; padding-left: 70px;">
+        <button class="k-button" id="btnSave">
+            Approve</button>
+        <button class="k-button" id="btnCancel">
+            Reject</button>
+    </li>
+</ul>
+<script type="text/javascript">
+    $(document).ready(function () {
+//        $("#btnSave").off("click");
+//        $("#btnSave").on('click', otherCashForApproval.rejectSelectedTransactionWithReason);
+//        $("#btnCancel").click(common.cancelMemoDialog);
+    });         
+</script>

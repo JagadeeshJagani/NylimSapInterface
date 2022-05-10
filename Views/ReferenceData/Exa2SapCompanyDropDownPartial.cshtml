@@ -1,0 +1,19 @@
+﻿@*@(Html.Kendo().DropDownListFor(m => m)
+             .Name("CompanyCode").HtmlAttributes(new { @style = "font-size:12px" })
+             .DataTextField("CompanyCode")
+                 .DataValueField("CompanyCode")
+                 .BindTo((System.Collections.IEnumerable)ViewData["CompanyCodes"])
+)*@
+
+@(Html.Kendo().DropDownList()
+            .Name("CompanyCode")
+            .DataTextField("CompanyCode")
+            .DataValueField("CompanyCode")
+            .Events(e => e.Change("companyChanged").DataBound("onCompanyChanged"))
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                    {
+                        read.Action("GetCompanies", "RunInterface").Data("getSelectedInterface");
+                    });
+            })

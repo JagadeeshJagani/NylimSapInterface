@@ -1,0 +1,70 @@
+﻿<div id="contentContainer">
+    <table style="height: 20px;">
+        <tr style="height: 20px;">
+            <td style="padding-left: 3px;">
+                <label class="category-label" for="companycode">
+                    Select Company Code:</label>
+            </td>
+            <td>@(Html.Kendo().DropDownList()
+                .Name("ReportCompanyCode").HtmlAttributes(new { style = "width:200px" })
+            .DataTextField("CompanyName")
+            .DataValueField("CompanyCode")
+                .Events(e => e.Change("reports.prePostReconcompanyChanged"))
+            .OptionLabel("Select Company Code")                 
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                    {
+                        read.Action("GetCompanies", "Reports", new { CompanyCode = "ALL", CompanyName = "ALL" }).Data("getSelectedInterface");
+                    });
+            })
+            )
+            </td>
+            <td>
+                <label class="category-label" for="companycode">
+                    Asofdate:</label>
+            </td>
+            <td>
+                @(Html.Kendo().DropDownList()
+                .Name("ReportAsofdate")
+                        .OptionLabel("Select Asofdate")
+                                 .HtmlAttributes(new { style = "width:250px" })
+                .AutoBind(false)
+                            .DataTextField("EventDate")
+                            .DataValueField("RecrunId")
+                             .Events(e => e.Change("reports.loadexactPrePostReport"))
+                            .DataSource(source =>
+                            {
+                                source.Read(read =>
+                                    {
+                                        read.Action("GetAsofdate", "Reports").Data("reports.prePostReconparams");
+                                    });
+                            })
+            )
+            </td>
+            <td>
+                <button class="k-button navbuttons" id="btnOpen">
+                    Open in new window</button>
+            </td>
+        </tr>
+    </table>
+    <div id="reportContainer" style="overflow: hidden; height: 100%">
+        <iframe id="exactprepostreportframe" width="100%" height="100%" frameborder="0">
+        </iframe>
+    </div>
+</div>
+<script type="text/javascript">
+
+
+    $(document).ready(function () {
+        $("#btnOpen").click(reports.loadexactPrePostReportinNewWindow);
+
+        $('iframe').load(function () {
+            $('#loading').hide();
+            $('.loader').hide();
+            $('.loaderlogo').hide();
+            $.ajaxSetup({ async: true });
+        });
+
+    });
+</script>

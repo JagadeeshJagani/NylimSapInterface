@@ -1,0 +1,192 @@
+﻿
+@{
+    ViewBag.Title = "Rules Table";
+}
+@section featured {
+}
+<script type="text/javascript">
+    function deleteRule() {
+        var myGrid = $('#grid').data("kendoGrid");
+
+        if (myGrid.select().length == 0) {
+            alert("Select record to be removed!");
+            return false;
+        }
+        myGrid.removeRow(myGrid.select());
+    }
+    function dataBound(e) {
+        $("#grid").off("click", ".k-grid-Delete", deleteRule);
+        $("#grid").on("click", ".k-grid-Delete", deleteRule);
+    }
+    function onRequestEnd(e) {
+        if (e.type == "update" && !e.response.errors) {
+            common.showSuccessMsgSlide("Ivt2Sap Rule Updated Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+        if (e.type == "create" && !e.response.errors) {
+            common.showSuccessMsgSlide("Ivt2Sap Rule Created Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+        if (e.type == "destroy" && !e.response.errors) {
+            common.showSuccessMsgSlide("Ivt2Sap Rule Removed Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+    }
+
+
+</script>
+<script id="fileTemplate" type="text/x-kendo-template">
+    <span class='k-progress'></span>
+    <div class='file-wrapper'>
+        <h6 class='file-heading file-name-heading'>Name: #=name#</h6>
+        <button type='button' id='btnUploadFile' class='k-upload-action'></button>
+    </div>
+</script>
+<div id="gridcontentwrapper">
+
+    <table style="display:none">
+        <tr>
+            <td style="width:300px;">
+
+                @(Html.Kendo().Upload()
+                        .Name("rulesTableUpload")
+                                .Events(e => e.Upload("common.onUpload").Success("common.onUploadSuccess").Error("common.onUploadError"))
+                        .HtmlAttributes(new { @style = "width:300px;" })
+                        //.TemplateId("fileTemplate")
+                        .Multiple(false)
+                        .Messages(m => m.Select("Select File..").StatusUploaded("File Successfully uploaded!"))
+                        .Async(a => a
+                            .Save("ImportRulesData", "RulesTable")
+                            .Remove("RemoveImportedRulesData", "RulesTable")
+                            .AutoUpload(false)
+                        )
+
+                )
+            </td>
+            <td>
+                <input type="checkbox" id="clearAllData" name="clearAllData" title="Clear all data prior import"
+                       checked="checked" value="Clear All Data"></input><label for="clearAllData"
+                                                                               style="display: inline-block;">&nbsp;Clear All Data</label>
+            </td>
+        </tr>
+    </table>
+
+
+
+
+    @(Html.Kendo().Grid<NylimSapInterface.Model.Ivt2SapRules>()
+                .Name("grid")
+            .Groupable()
+            .Resizable(resize => resize.Columns(true))
+            .Scrollable(scrollable => scrollable.Virtual(true))
+            .Events(e => e.DataBound("dataBound"))
+            .Editable(e => e.Mode(GridEditMode.PopUp).TemplateName("Ivt2SapRuleTemplate"))
+            .Sortable()
+            .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+            .Filterable(f => f.Enabled(true))
+            .Columns(columns =>
+            {
+                columns.Bound(p => p.RuleId).Groupable(true).Title("Rule Id").Width(80);
+                columns.Bound(p => p.InvestranAcct).Title("Investran Account").Width(300).HtmlAttributes(new { @style = "white-space: nowrap; text-overflow: ellipsis;", @value = "bar" });
+                columns.Bound(p => p.SapCompanyCode).Title("Sap Company Code").Width(130);
+                columns.Bound(p => p.LegalEntity).Groupable(true).Title("Legal Entity").Width(280).HtmlAttributes(new { @style = "white-space: nowrap; text-overflow: ellipsis;", @value = "bar" });
+                columns.Bound(p => p.Vehicle).Groupable(true).Title("Vehicle").Width(380).HtmlAttributes(new { @style = "white-space: nowrap; text-overflow: ellipsis;", @value = "bar" });
+                columns.Bound(p => p.Investor).Title("Investor").Width(380).HtmlAttributes(new { @style = "white-space: nowrap; text-overflow: ellipsis;", @value = "bar" });
+                columns.Bound(p => p.GlAcctNo).Title("GL Account Number").Width(150);
+                columns.Bound(p => p.GlAccountType).Title("GL Account Type").Width(210).HtmlAttributes(new { @style = "white-space: nowrap; text-overflow: ellipsis;", @value = "bar" });
+                columns.Bound(p => p.GlAcctDescription).Title("GL Account Description").Width(300).HtmlAttributes(new { @style = "white-space: nowrap; text-overflow: ellipsis;", @value = "bar" });
+                columns.Bound(p => p.Deal).Title("Deal").Width(140);
+                columns.Bound(p => p.PartnerCode).Title("PartnerCode").Width(140);
+                columns.Bound(p => p.DistributionChannelCode).Title("Distribution Channel Code").Width(155);
+                columns.Bound(p => p.LedgerGroupCode).Title("Ledger Group Code").Width(135);
+                columns.Bound(p => p.GLDocumentType).Title("GL Document Type").Width(135);
+                columns.Bound(p => p.PremiumLoadType).Title("Premium Load Type").Width(135);
+                columns.Bound(p => p.PolicyRiderType).Title("Policy Rider Type").Width(135);
+                columns.Bound(p => p.SeparateAccountSeriesCode).Title("Separate Account Series Code").Width(175);
+                columns.Bound(p => p.SourceProductCode).Title("Source Product Code").Width(145);
+                columns.Bound(p => p.StateCode).Title("State Code").Width(95);
+                columns.Bound(p => p.QualifiedNonQualifiedIndicator).Title("Qualified/Non-Qualified Indicator").Width(190);
+                columns.Bound(p => p.SourceInvestmentDivisionCode).Title("Investment Division Code").Width(190);
+                columns.Bound(p => p.ProductCode).Title("Product Code").Width(100);
+                columns.Bound(p => p.SubProductCode).Title("Sub Product Code").Width(120);
+                columns.Bound(p => p.SAPTradingPartnerCode).Title("SAP Trading Partner Code").Width(190);
+                columns.Bound(p => p.InvestranCommonID).Title("Investor Common ID").Width(150);
+                columns.Bound(p => p.RecordAction).Hidden(true);
+
+            })
+           .ToolBar(toolbar =>
+           {
+               toolbar.Template(
+    @<text> <a class="k-button k-button-icontext k-grid-add" href="/SapGuiInterface/ReferenceData/GetRulesTable?grid-mode=insert">
+            <span class="k-icon k-add"></span>Create Rule
+        </a> <a class="k-button k-button-icontext k-grid-Delete"
+                href="#"><span></span>Delete</a>
+        <a class="k-button k-button-icontext k-grid-Export" href='#'>
+            <span>
+            </span>
+            <span class=" k-icon k-grid-export-image" />Export
+        </a>
+    </text>);
+   })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+                .Model(m =>
+                {
+                    m.Id("RuleId");
+                    m.Field(p => p.RuleId).Editable(false);
+                    m.Field(p => p.RecordAction).Editable(false);
+                })
+        .Events(e => e.RequestEnd("onRequestEnd"))
+        .Create(update => update.Action("SaveIvt2SapRules", "RulesTable"))
+        .Update(update => update.Action("UpdateIvt2SapRules", "RulesTable"))
+        .Destroy(destroy => destroy.Action("DeleteIvt2SapRules", "RulesTable"))
+        .PageSize(45)
+        .ServerOperation(false)
+        .Read(read => read.Action("GetRulesTable", "RulesTable").Data("getSelectedInterface"))
+    )
+    )
+</div>
+<script type="text/javascript">
+    var securityModel = common.permissionSet;
+    if (securityModel.HasIVT2SAP_EDIT_RULE_Access) {
+        $('#grid').data("kendoGrid").element.delegate("tbody>tr", "dblclick", function () {
+            $('#grid').data("kendoGrid").editRow($(this));
+        });
+    }
+    $("#grid").off("click", ".k-grid-Export", common.exportToExcel);
+    $("#grid").on("click", ".k-grid-Export", common.exportToExcel);
+    $("#grid").off("click", ".k-grid-Delete", deleteRule);
+    $("#grid").on("click", ".k-grid-Delete", deleteRule);
+
+    var test = $('#grid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+
+    $(document).ready(function () {
+        var securityModel = common.permissionSet;
+        if (securityModel.HasIVT2SAP_INT_Access || securityModel.HasIVT2SAP_EDIT_RULE_Access) {
+            if (securityModel.HasIVT2SAP_EDIT_RULE_Access) {
+                $('#grid').find('.k-toolbar .k-button').prop("disabled", false);
+                $(".k-upload-button").prop("disabled", false);
+            }
+            else {
+                $('#grid').find('.k-toolbar .k-button').prop("disabled", true);
+                $(".k-upload-button").prop("disabled", true);
+            }
+        }
+        else {
+            //Select PanelBar Item..
+            var panelBar = $("#panelbar").kendoPanelBar().data("kendoPanelBar");
+            var rootItem = panelBar.element.children("li").eq(0).find(".k-group > .k-item").eq(2);
+            rootItem.find("span").trigger("click");
+        }
+
+
+    });
+</script>

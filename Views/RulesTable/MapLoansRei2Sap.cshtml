@@ -1,0 +1,347 @@
+﻿<script type="text/javascript">
+    var savelmsmapping = 0;
+    function entityFilter(element) {
+        element.kendoDropDownList({
+            dataSource: {
+                transport: {
+                    read: '@Url.Action("GetRei2SapRulesEntity", "RulesTable")'
+                }
+            },
+            optionLabel: "--Select Value--"
+        });
+    }
+    
+   
+    function getSelectedRows(gridid) {
+        var grid = $("#" + gridid).data("kendoGrid");
+        var selection = [];
+
+        grid.select().each(function () {
+            var dataItem = grid.dataItem($(this));
+
+            selection.push(dataItem);
+        });
+        return selection;
+    }
+
+    function saveMapping() {
+        var gview = $("#maingrid").data("kendoGrid");
+        //Getting selected item
+        var selectedItem = gview.dataItem(gview.select());
+
+        if ($("#maingrid").data("kendoGrid").select().length <= 0) {
+            alert(" Select at least one item to be added!");
+            return false;
+        }
+        if (!checkDup(selectedItem.LOAN)) 
+            {
+                alert("Selected Loan already exists in applied loans!");
+                return false;
+            }
+       
+        SubmitChages(true, false);
+    }
+
+    function saveAllMapping() {
+        savelmsmapping = 0;
+        if ($("#maingrid").data("kendoGrid").dataSource.total() <= 0) {
+            alert("Available Loans grid is empty!");
+            return false;
+        }
+        var data = $("#maingrid").data("kendoGrid").dataSource.data();
+        $(data).each(function (i, item) {
+            if (!checkDup(item.LOAN || savelmsmapping == 1)) {
+                alert("Selected Loan already exists in applied loans!");
+                return false;
+            }
+        });
+        if (savelmsmapping == 0) 
+        {
+            SubmitChages(true, true);
+        }
+        
+
+    }
+
+    function checkDup(value) {
+        var data = $("#childgrid").data("kendoGrid").dataSource.data();
+        var invalid = 0;
+        $(data).each(function (i, item) {
+            if (item.Param_value1 == value) {
+                invalid++;
+                savelmsmapping = savelmsmapping + 1;
+            }
+        });
+        if (invalid > 0) {
+            return false;
+        }
+        return true;
+    }
+    function removeMapping() {
+
+        if ($("#childgrid").data("kendoGrid").select().length <= 0) {
+            alert(" Select at least one item to be removed from mapping!");
+            return false;
+        }
+        SubmitChages(false, false);
+    }
+    function removeAllMapping() {
+        if ($("#childgrid").data("kendoGrid").dataSource.total() <= 0) {
+            alert("Applied Loans grid is empty!");
+            return false;
+        }
+        SubmitChages(false, true);
+    }
+    function SubmitChages(isAdd, isAll) {
+        var selection;
+        var mappingUrl = '';
+        if (isAll) {
+            if (isAdd) {
+                selection = $("#maingrid").data("kendoGrid").dataSource.data();
+                mappingUrl = base_url + "RulesTable/SaveRei2SapLoans";
+            }
+            else {
+                selection = $("#childgrid").data("kendoGrid").dataSource.data();
+                mappingUrl = base_url + "RulesTable/RemoveRei2SapLoans";
+            }
+        }
+        else {
+            if (isAdd) {
+                mappingUrl = base_url + "RulesTable/SaveRei2SapLoans";
+            }
+            else {
+                mappingUrl = base_url + "RulesTable/RemoveRei2SapLoans";
+            }
+            selection = isAdd ? getSelectedRows("maingrid") : getSelectedRows("childgrid");
+        }
+
+        $.ajax({
+            type: "POST",
+            url: mappingUrl,
+            data: JSON.stringify({ rei2SapLoans: selection }),
+            dataType: "json",
+            contentType: "application/json; charset=utf-8",
+            success: function (form) {
+
+            },
+            statusCode: {
+                201: function (result) {
+                    $("#maingrid").data("kendoGrid").dataSource.read();
+                    $("#childgrid").data("kendoGrid").dataSource.read();
+                    if (isAdd) {
+                        common.showSuccessMsgSlide("Selected Rule(s) mapped to Company!");
+                    }
+                    else {
+                        common.showSuccessMsgSlide("Selected Rule(s) removed from Company Mapping!");
+                    }
+                },
+                500: function (result) {
+                }
+            }
+        });
+    }
+    function clearGridSelection() {
+        $("#maingrid").data("kendoGrid").clearSelection();
+        $("#childgrid").data("kendoGrid").clearSelection();
+    }
+    $(document).ready(function () {
+        $("#btnMoveAllToApplied").click(saveAllMapping);
+        $("#btnMoveSelectedToApplied").click(saveMapping);
+        $("#btnMoveAllToAvailable").click(removeAllMapping);
+        $("#btnMoveSelectedToAvailable").click(removeMapping);
+        $("#btnClearSelection").click(clearGridSelection);
+    });    
+</script>
+<div id="contentContainer">
+     <div id="mappingContainer" style="width: 99%;">
+        <div style="float: left; width: 40%; height: 98%;padding-left:5px;">
+            <label class="category-label">
+                Available Loans:</label>
+            @(Html.Kendo().Grid<NylimSapInterface.Model.Rei2SapAvailableLoans>()
+            .Name("maingrid")
+            .Groupable(g => g.Enabled(false))            
+            .Resizable(resize => resize.Columns(true))            
+            .Scrollable(scrollable => scrollable.Virtual(true))
+            .Sortable()
+            .Selectable(selectable => selectable.Mode(GridSelectionMode.Multiple))
+            .Filterable(filterable => filterable
+                .Extra(false)
+                .Operators(operators => operators
+                    .ForString(str => str.Clear()
+                        .StartsWith("Starts with")
+                        .IsEqualTo("Is equal to")
+                        .IsNotEqualTo("Is not equal to")
+                    ))
+            )
+            .Columns(columns =>
+            {
+               // columns.Bound(p => p.PFXRECNUM).Title(" ").Width(28).ClientTemplate("<input type=\"checkbox\" #= PFXRECNUM === 'kendo' ? checked=\"checked\" : \"\" #  value=#= PFXRECNUM # />").Filterable(false);
+                columns.Bound(p => p.LOAN).Title("LOAN").Width(120);
+            })
+            //.ToolBar(toolBar =>
+            // {
+            //     toolBar.Custom().Text("Select All").Url("#").Name("SelectAll").HtmlAttributes(new { @id = "mapavailableselectall" });
+            //     toolBar.Custom().Text("Unselect All").Url("#").Name("UnSelectAll").HtmlAttributes(new { @id = "mapavailableunselecteall" });
+            // })
+            .DataSource(dataSource => dataSource
+                .Ajax()
+                .ServerOperation(true)
+              //  .PageSize(45)
+                .Read(read => read.Action("GetAvailableRei2SapLoans", "RulesTable"))
+            )
+            )
+        </div>
+        <div style="text-align: center; float: left; width: 10%; padding: 20% 2% 30% 2%;">
+            <table>
+                <tr>
+                    <td>
+                        <button value="2" title="Map All Loans" class="k-button" id="btnMoveAllToApplied"
+                            style="width: 80px;">
+                            >>
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button value="2" title="Map Selected Loans" class="k-button" id="btnMoveSelectedToApplied"
+                            style="width: 80px;">
+                            >
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button value="2" title="Remove Mapping for All Loans" class="k-button" id="btnMoveAllToAvailable"
+                            style="width: 80px;">
+                            <<
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button value="2" title="Remove Mapping for Selected Loans" class="k-button" id="btnMoveSelectedToAvailable"
+                            style="width: 80px;">
+                            <
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button value="2" title="Clear Selection" class="k-button" id="btnClearSelection"
+                            style="width: 80px;">
+                            Clear
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div style="float: left; width: 40%; height: 98%;">
+            <label class="category-label">
+                Applied Loans:</label>
+            @(Html.Kendo().Grid<NylimSapInterface.Model.Rei2SapAppliedLoans>()
+    .Name("childgrid")
+    .Groupable(g => g.Enabled(false))
+    .Resizable(resize => resize.Columns(true))
+    .Scrollable(scrollable => scrollable.Virtual(true))
+    .Sortable()
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Multiple))
+    .Filterable(filterable => filterable
+        .Extra(false)
+        .Operators(operators => operators
+            .ForString(str => str.Clear()
+                .StartsWith("Starts with")
+                .IsEqualTo("Is equal to")
+                .IsNotEqualTo("Is not equal to")
+            ))
+    )
+    .Columns(columns =>
+    {
+       // columns.Bound(p => p.Category).Title(" ").Width(28).ClientTemplate("<input type=\"checkbox\" #= Category === 'kendo' ? checked=\"checked\" : \"\" #  value=#= Category # />").Filterable(false).Sortable(false);
+        columns.Bound(p => p.Param_value1).Title("LOAN").Width(90);
+    })
+    //.ToolBar(toolBar =>
+    // {
+    //     toolBar.Custom().Text("Select All").Url("#").Name("SelectAllApplied").HtmlAttributes(new { @id = "mapappliedselectall" });
+    //     toolBar.Custom().Text("Unselect All").Url("#").Name("UnSelectAllApplied").HtmlAttributes(new { @id = "mapappliedunselecteall" });
+    // })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        //.PageSize(45)
+        .ServerOperation(true)
+        .Read(read => read.Action("GetAppliedRei2SapLoans", "RulesTable"))
+    )
+    )
+        </div>
+        <br style="clear: left;" />
+    </div>
+</div>
+<script type="text/javascript">
+
+    var test = $('#childgrid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+
+    var test = $('#maingrid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+
+
+    $(document).ready(function () {
+        var securityModel = common.permissionSet;
+        if (securityModel.HasREI2SAP_INT_Access || securityModel.HasREI2SAP_EDIT_RULE_Access) {
+            if (securityModel.HasREI2SAP_EDIT_RULE_Access) {
+                $(".k-button").prop("disabled", false);
+            }
+            else {
+                $(".k-button").prop("disabled", true);
+            }
+        }
+        else {
+            //Select PanelBar Item..
+            //Display No Access message Page
+        }
+//        $("#maingrid").on("click", "tbody tr td input:checkbox", common.rowSelection);
+//        $("#maingrid").off("click", ".k-grid-SelectAll", common.selectAll);
+//        $("#maingrid").on("click", ".k-grid-SelectAll", common.selectAll);
+//        $("#maingrid").off("click", ".k-grid-UnSelectAll", common.unSelectAll);
+//        $("#maingrid").on("click", ".k-grid-UnSelectAll", common.unSelectAll);
+//        $("#childgrid").on("click", "tbody tr td input:checkbox", common.rowSelection);
+//        $("#childgrid").off("click", ".k-grid-SelectAllApplied", common.SelectAllApplied);
+//        $("#childgrid").on("click", ".k-grid-SelectAllApplied", common.SelectAllApplied);
+//        $("#childgrid").off("click", ".k-grid-UnSelectAllApplied", common.unSelectAllApplied);
+//        $("#childgrid").on("click", ".k-grid-UnSelectAllApplied", common.unSelectAllApplied);
+//        var grid = $("#childgrid").data("kendoGrid");
+
+//        $('#checkAll').click(function () {
+//            if ($(this).attr('checked')) {
+//                $('.selectAll').attr('checked', 'checked');
+//            } else {
+//                $('.selectAll').removeAttr('checked');
+//            }
+//        });
+
+//        $('#maingrid input[type=checkbox][id!=checkAll]').click(function () {
+//            var numChkBoxes = $('#maingrid input[type=checkbox][id!=checkAll]').length;
+//            var numChkBoxesChecked = $('#maingrid input[type=checkbox][checked][id!=checkAll]').length;
+//            if (numChkBoxes == numChkBoxesChecked && numChkBoxes > 0) {
+//                $('#checkAll').attr('checked', 'checked');
+//            }
+//            else {
+//                $('#checkAll').attr('checked', '');
+//            }
+//        });
+    });
+      
+</script>

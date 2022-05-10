@@ -1,0 +1,28 @@
+﻿@model NylimSapInterface.Model.Ivt2SapCompanyFrequency
+<div class="editor-label">
+    @Html.LabelFor(model => model.CompanyCode)
+   
+</div>
+<div class="editor-field">
+    @(Html.Kendo().DropDownList()
+    .Name("CompanyCode")
+    .DataTextField("CompanyCode")
+    .DataValueField("CompanyCode")
+    .OptionLabel("Please Select")
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetCompanies", "RunInterface").Data("getSelectedInterface");
+            
+        });
+    }))
+     @Html.ValidationMessageFor(model => model.CompanyCode)
+</div>
+<div class="editor-label">
+    @Html.LabelFor(model => model.FrequencyIndicator)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.FrequencyIndicator, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.FrequencyIndicator)
+</div>

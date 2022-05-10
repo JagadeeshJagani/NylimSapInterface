@@ -1,0 +1,310 @@
+﻿@{
+    ViewBag.Title = "Account/Strategy Map";
+}
+@section featured {
+}
+
+<style type="text/css">
+.k-invalid-msg
+{
+    margin-left : 10em !important;
+}
+.k-tooltip-validation
+{
+    position:absolute !important;
+  margin-left : 10em !important;
+}
+#grid
+{  	
+	width:1900px !important;
+}
+#strategyAccountgrid
+{  	
+	width:1900px !important;
+}
+    </style>
+<script type="text/javascript">
+    function deleteRule() {
+        var myGrid = $('#grid').data("kendoGrid");
+
+        if (myGrid.select().length == 0) {
+            alert("Select record to be removed!");
+            return false;
+        }
+        myGrid.removeRow(myGrid.select());
+    }
+
+    function dataBound(e) {
+        $("#grid").off("click", ".k-grid-Delete", deleteRule);
+        $("#grid").on("click", ".k-grid-Delete", deleteRule);
+    }
+
+    function deleteStrategyRule() {
+        var strategyAccountgrid = $('#strategyAccountgrid').data("kendoGrid");
+
+        if (strategyAccountgrid.select().length == 0) {
+            alert("Select record to be removed!");
+            return false;
+        }
+        strategyAccountgrid.removeRow(strategyAccountgrid.select());
+    }
+
+    function dataStrategyBound(e) {
+        $("#strategyAccountgrid").off("click", ".k-grid-Delete", deleteStrategyRule);
+        $("#strategyAccountgrid").on("click", ".k-grid-Delete", deleteStrategyRule);
+    }
+
+    function onRev2SapRequestEnd(e) {
+        if (e.type == "update" && !e.response.errors) {
+            common.showSuccessMsgSlide("Rev2Sap Account Rule Updated Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+        if (e.type == "create" && !e.response.errors) {
+            common.showSuccessMsgSlide("Rev2Sap Account Rule Created Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+        if (e.type == "destroy" && !e.response.errors) {
+            common.showSuccessMsgSlide("Rev2Sap Account Rule Deleted Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+    }
+
+    function onRev2SapStrategyRequestEnd(e) {
+        if (e.type == "update" && !e.response.errors) {
+            common.showSuccessMsgSlide("Rev2Sap Strategy Rule Updated Successfully!");
+            $("#strategyAccountgrid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+        if (e.type == "create" && !e.response.errors) {
+            common.showSuccessMsgSlide("Rev2Sap Strategy Rule Created Successfully!");
+            $("#strategyAccountgrid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+        if (e.type == "destroy" && !e.response.errors) {
+            common.showSuccessMsgSlide("Rev2Sap Strategy Rule Deleted Successfully!");
+            $("#strategyAccountgrid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+    }
+</script>
+ <table style="height: 20px;">
+        <tr>
+            
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="CalculationGroup">
+                  Select Rule Type:</label>
+            </td>
+            <td>@(Html.Kendo().DropDownList()
+                 .Name("ddlRuleType").HtmlAttributes(new { @style = "font-size:12px" })
+             .DataTextField("Text").OptionLabel("Account Map")
+            .Events(e => e.Change("common.selectRuleType"))
+             .DataValueField("Value").AutoBind(false)
+               .BindTo((System.Collections.IEnumerable)ViewData["ruleType"])
+                           
+)
+            </td>
+            
+        </tr>
+</table>
+<div id="gridcontentwrapper">
+    @(Html.Kendo().Grid<NylimSapInterface.Model.Rev2SapAccountRules>()
+        .Name("grid")
+    .Groupable()
+    .Reorderable(reorder => reorder.Columns(true))
+    .Resizable(resize => resize.Columns(true))
+    .Events(e => e.DataBound("dataBound"))
+    .Sortable()
+    .Editable(e => e.Mode(GridEditMode.PopUp).TemplateName("Rev2SapAccountRulesTemplate"))
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Filterable(f => f.Enabled(true))
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.RuleId).Title("Rule Id").Width(60);
+        columns.Bound(p => p.Calculation_Group).Title("Calculation Group").Width(60);
+        columns.Bound(p => p.Subset).Title("JE Subset").Width(100);
+        columns.Bound(p => p.JE_Type).Title("JE Type").Width(80);
+        columns.Bound(p => p.cost_center).Title("Cost Center").Width(80);
+        columns.Bound(p => p.DebitOrCredit).Title("Debit Or Credit").Width(80);
+        columns.Bound(p => p.alloc_perc).Title("Allocation Percentage").Width(80);
+        columns.Bound(p => p.ProfitCenter).Width(80);
+        columns.Bound(p => p.Account).Title("Account").Width(100);
+        columns.Bound(p => p.AccountName).Title("Account Name").Width(100);
+        columns.Bound(p => p.trading_partner).Title("Trading Partner").Width(80);
+        columns.Bound(p => p.entity).Title("Entity").Width(100);
+        columns.Bound(p => p.new_company_code).Title("New Company Code").Width(80);
+        columns.Bound(p => p.distribution_channel).Title("Distribution Channel ").Width(120);
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Create().Text("Create Rule");
+        toolbar.Custom().Text("Delete").Name("Delete").Url("#");
+        toolbar.Template(
+        @<text>
+                    <a class="k-button k-button-icontext k-grid-add" ><span class="k-icon k-add"></span>Create Rule</a>
+                    <a class="k-button k-button-icontext k-grid-Delete" href="#"><span></span>Delete</a>
+
+                    <a class="k-button k-button-icontext k-grid-Export" href='#'>
+                        <span>
+                        </span>
+                        <span class=" k-icon k-grid-export-image"/>Export
+                    </a>  
+                       
+            </text>);
+        
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+                .Model(m =>
+                {
+                    m.Id("RuleId");
+                    m.Field(p => p.RuleId).Editable(false);
+                })
+                .Events(e => e.RequestEnd("onRev2SapRequestEnd"))
+                        .Create(update => update.Action("SaveRev2SapAccountRules", "RulesTable").Data("common.getAccountRuleCalcSubsetValue"))
+                                .Update(update => update.Action("UpdateRev2SapAccountRules", "RulesTable").Data("common.getAccountRuleCalcSubsetValue"))
+                        .Destroy(destroy => destroy.Action("DeleteRev2SapAccountRules", "RulesTable"))
+        //.PageSize(40)
+        .ServerOperation(true)
+        .Read(read => read.Action("GetRulesTable", "RulesTable").Data("getSelectedInterface"))
+    )
+)
+</div>
+<div id="gridcontentwrapper1" style="display:none;">
+@(Html.Kendo().Grid<NylimSapInterface.Model.Rev2SapStrategyRules>()
+        .Name("strategyAccountgrid")
+    .Groupable()
+    .Resizable(resize => resize.Columns(true))
+    .Reorderable(reorder => reorder.Columns(true))
+    .Events(e => e.DataBound("dataStrategyBound"))
+    .Sortable()
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Editable(e => e.Mode(GridEditMode.PopUp).TemplateName("Rev2SapStrategyRulesTemplate"))
+    .Filterable(f => f.Enabled(true))
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.RuleId).Title("Rule Id").Width(60).Groupable(true);
+        //columns.Bound(p => p.GroupName).Title("Calculation Group").Width(60).Groupable(true);
+        columns.Bound(p => p.Ticker).Title("Ticker").Width(60).Groupable(true);
+        columns.Bound(p => p.Cusip).Title("Cusip").Width(100).Groupable(true);
+        columns.Bound(p => p.Product).Title("Product").Width(80).Groupable(true);
+        columns.Bound(p => p.SubProduct).Title("Sub Product").Width(80).Groupable(true);
+        columns.Bound(p => p.Category).Title("Category").Width(60).Groupable(true);
+        columns.Bound(p => p.Profit_Center).Title("Profit Center").Width(100).Groupable(true);
+        columns.Bound(p => p.Fundname).Title("Fund Name").Width(100).Groupable(true);
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Create().Text("Create Rule");
+        toolbar.Custom().Text("Delete").Name("Delete").Url("#");
+        toolbar.Template(
+        @<text>
+                    <a class="k-button k-button-icontext k-grid-add" ><span class="k-icon k-add"></span>Create Rule</a>
+                    <a class="k-button k-button-icontext k-grid-Delete" href="#"><span></span>Delete</a>
+
+                    <a class="k-button k-button-icontext k-grid-Export" href='#'>
+                        <span>
+                        </span>
+                        <span class=" k-icon k-grid-export-image"/>Export
+                    </a>  
+                       
+            </text>);
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+                .Model(m =>
+                {
+                    m.Id("RuleId");
+                    m.Field(p => p.RuleId).Editable(false);
+                })
+                .Events(e => e.RequestEnd("onRev2SapStrategyRequestEnd"))
+                .Create(update => update.Action("SaveRev2SapStrategyRules", "RulesTable").Data("common.getCusipTickerValue"))
+                .Update(update => update.Action("UpdateRev2SapStrategyRules", "RulesTable").Data("common.getCusipTickerValue"))
+                .Destroy(destroy => destroy.Action("DeleteRev2SapStrategyRules", "RulesTable").Data("common.getCusipTickerValue"))
+        .ServerOperation(true)
+        .Read(read => read.Action("GetStrategyRulesTable", "RulesTable").Data("getSelectedInterface"))
+    )
+)
+</div>
+<script type="text/javascript">
+    var securityModel = common.permissionSet;
+    if (securityModel.HasREV2SAP_EDIT_RULE_Access) {
+        $('#grid').data("kendoGrid").element.delegate("tbody>tr", "dblclick", function () {
+            $('#grid').data("kendoGrid").editRow($(this));
+        });
+        $('#strategyAccountgrid').data("kendoGrid").element.delegate("tbody>tr", "dblclick", function () {
+            $('#strategyAccountgrid').data("kendoGrid").editRow($(this));
+        });
+    }
+    $("#grid").off("click", ".k-grid-Export", common.exportToExcel);
+    $("#grid").on("click", ".k-grid-Export", common.exportToExcel);
+    $("#strategyAccountgrid").off("click", ".k-grid-Export", common.exportToExcel);
+    $("#strategyAccountgrid").on("click", ".k-grid-Export", common.exportToExcel);
+    var test = $('#grid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+
+    $(document).ready(function () {
+        var securityModel = common.permissionSet;
+        if (common.strategyCusip != undefined) {
+            common.strategyCusip = '';
+            common.strategyTicker = '';
+            common.strategyFundName = '';
+        }
+        if (securityModel.HasREV2SAP_INT_Access || securityModel.HasREV2SAP_EDIT_RULE_Access) {
+            if (securityModel.HasREV2SAP_EDIT_RULE_Access) {
+                $('#grid').find('.k-toolbar .k-button').prop("disabled", false);
+                $('#strategyAccountgrid').find('.k-toolbar .k-button').prop("disabled", false);
+                $(".k-upload-button").prop("disabled", false);
+            }
+            else {
+                $('#grid').find('.k-toolbar .k-button').prop("disabled", true);
+                $('#strategyAccountgrid').find('.k-toolbar .k-button').prop("disabled", true);
+                $(".k-upload-button").prop("disabled", true);
+            }
+        }
+        else {
+            //Select PanelBar Item..
+            var panelBar = $("#panelbar").kendoPanelBar().data("kendoPanelBar");
+            var rootItem = panelBar.element.children("li").eq(0).find(".k-group > .k-item").eq(2);
+            rootItem.find("span").trigger("click");
+        }
+        (function ($, kendo) {
+            var cnt = 0;
+            var strCategory = '';
+            $.extend(true, kendo.ui.validator, {
+                rules: { // custom rules
+                    Categoryvalidation: function (input, params) {
+                        //check for the rule attribute 
+                        var container = $(input).closest("tr");
+                        if (input.is("[name='GroupName']")) {
+                            if (input.is("[name='GroupName']")) {
+                                strCategory = container.find("input[name=GroupName]").prevObject.prevObject[0].value;
+                            }
+
+                            if (input.selector != ':input[data-bind="value:GroupName"]') {
+                                if (input[0].name == 'GroupName' && (strCategory == 'Please Select' || strCategory == '')) {
+                                    return false;
+                                }
+                            }
+                            return true;
+                        }
+                        else {
+                            return true
+                        }
+                    }
+                },
+                messages: { //custom rules messages
+                    Categoryvalidation: function (input) {
+                        // return the message text
+                        if (input[0].name == 'GroupName') {
+                            return "Please select Group Name";
+                        }
+                    }
+                }
+            });
+        })(jQuery, kendo);
+    });
+</script>

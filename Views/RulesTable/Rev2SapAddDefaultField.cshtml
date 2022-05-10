@@ -1,0 +1,195 @@
+﻿@{
+    ViewBag.Title = "JE Default Values";
+}
+@section featured {
+}
+<style type="text/css">
+.k-invalid-msg
+{
+    style: margin-left : 10em;
+}
+</style>
+<script type="text/javascript">
+  
+    function onRev2SapRequestEnd(e) {
+        if (e.type == "update" && !e.response.errors) {
+            common.showSuccessMsgSlide("Rev2Sap Default Fields Updated Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read();
+        }
+    }
+
+    function onEdit(e) {
+        var kendoWindow = e.container.data("kendoWindow");
+
+        if (e.model.isNew()) {
+          
+        } else {
+            //set options using the setOptions method
+            kendoWindow.setOptions({
+                title: "Update Default Fields!"
+            });
+        }
+    }
+</script>
+
+<table style="height: 20px;">
+        <tr>
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="CalculationGroup">Calculation Group: </label>
+             </td>
+              <td>
+                 @(Html.Kendo().DropDownList()
+                   .Name("ddlGroupName").HtmlAttributes(new { @style = "font-size:12px" })
+                     .DataTextField("Calculation_Group")
+                             .DataValueField("Calculation_Group")
+                     .OptionLabel("Please Select")
+                             .Events(e => e.Change("common.loadDefaultFieldSubSetData"))
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                        {
+                            read.Action("GetJEDefaultCalculationGroup", "RunInterface");
+                        });
+                    })
+                  ) 
+            </td>
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="JESubset">
+                  JE Subset: </label>
+            </td>
+            <td>
+            @(Html.Kendo().DropDownList()
+                         .Name("ddlJESubset").HtmlAttributes(new { style = "width:120px" })
+                          .DataTextField("Subset")
+                          .DataValueField("Subset")
+                          .OptionLabel("Please Select")
+                          .AutoBind(false)
+                  ) 
+            </td>
+           
+    
+              <td>
+                <button value="2" class="k-button" id="btnFilterDefaultField" style="width: 150px;">
+                    Filter Default Values</button>
+                
+            </td>
+             <td style="vertical-align:bottom;">
+            <a class="k-button k-button-icontext k-grid-Refresh" id="sapGUIDefaultFieldRefresh"
+                    href ="#"><span /><span class=" k-icon k-i-refresh" />
+                </a>
+            </td>
+          </tr>
+</table>
+<div id="gridcontentwrapper">
+    @(Html.Kendo().Grid<NylimSapInterface.Model.Rev2SapDefaultFields>()
+    .Name("grid")
+    .Groupable()
+    .Resizable(resize => resize.Columns(true))
+    .Events(e => e.Edit("onEdit"))
+    .Sortable()
+    .Reorderable(reorder => reorder.Columns(true))
+    .Editable(e => e.Mode(GridEditMode.PopUp).TemplateName("Rev2SapAddDefaultFieldTemplate"))
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Filterable(f => f.Enabled(true))
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.Calculation_Group).Title("Calculation Group").Width(60).Groupable(true);
+        columns.Bound(p => p.Subset).Title("JE Subset").Width(100).Groupable(true);
+        columns.Bound(p => p.company_group).Title("Company Group").Visible(false).Width(100).Groupable(true);
+        columns.Bound(p => p.JE_Number).Title("JE Number").Width(80).Groupable(true);
+        columns.Bound(p => p.BusinessJE_Explanation).Title("Business JE Explanation").Width(80).Groupable(true);
+        columns.Bound(p => p.BusinessJE_Share_Class).Title("Business JE Share Class").Width(60).Groupable(true);
+        columns.Bound(p => p.SapJE_RefDocument).Title("Sap JE RefDocument").Width(100).Groupable(true);
+        columns.Bound(p => p.SapJE_LineItemtext).Title("Sap JE LineItemtext").Width(80).Groupable(true);
+        columns.Bound(p => p.SapJE_Rps_Product).Title("Sap JE Rps Product").Visible(false).Width(80).Groupable(true);
+        columns.Bound(p => p.SapJE_Rps_Subproduct).Title("Sap JE Rps Subproduct").Visible(false).Width(60).Groupable(true);
+        columns.Bound(p => p.Prepared_By).Title("Prepared By").Width(80).Visible(false).Groupable(true);
+        columns.Bound(p => p.Reviewed_By).Title("Reviewed By").Width(80).Visible(false).Groupable(true);
+        columns.Bound(p => p.Approved_By).Title("Approved By").Width(60).Visible(false).Groupable(true);
+        columns.Bound(p => p.Private_Use_Text).Title("Private Use Text").Width(100).Visible(false).Groupable(true);
+        columns.Bound(p => p.Batch_Type).Title("Batch Type").Width(80).Visible(false).Groupable(true);
+        columns.Bound(p => p.Reverse_Indicator).Title("Reverse Indicator").Width(80).Visible(false).Groupable(true);
+        columns.Bound(p => p.Cycle_Indicator).Title("Cycle Indicator").Width(60).Visible(false).Groupable(true);
+        columns.Bound(p => p.No_Cycles).Title("No_Cycles").Width(80).Visible(false).Groupable(true);
+        columns.Bound(p => p.Ref_No).Title("Ref No").Width(80).Visible(false).Groupable(true);
+        columns.Bound(p => p.Post_Date).Title("Post Date").Width(60).Visible(false).Groupable(true);
+        columns.Bound(p => p.Entd_By).Title("Entd By").Width(100).Visible(false).Groupable(true);
+        columns.Bound(p => p.Auth_By).Title("Auth By").Width(80).Visible(false).Groupable(true);
+        columns.Bound(p => p.Document_Header_text).Title("Document Header text").Width(80).Visible(false).Groupable(true);
+    })
+    .ToolBar(toolbar =>
+    {
+        toolbar.Template(
+        @<text>
+                    <a class="k-button k-button-icontext k-grid-Export" href='#'>
+                        <span>
+                        </span>
+                        <span class=" k-icon k-grid-export-image"/>Export
+                    </a>  
+                       
+            </text>);
+        
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+                .Model(m =>
+                {
+                    m.Id("company_group");
+                    m.Field(p => p.company_group).Editable(false);
+                })
+                .Events(e => e.RequestEnd("onRev2SapRequestEnd"))
+                .Update(update => update.Action("UpdateRev2SapDefaultFields", "RulesTable"))
+                .Read(read => read.Action("GetDefaultFieldValues", "RulesTable").Data("common.getDefaultFieldData"))
+    )
+)
+</div>
+<script type="text/javascript">
+    var securityModel = common.permissionSet;
+    if (securityModel.HasREV2SAP_EDIT_RULE_Access) {
+        $('#grid').data("kendoGrid").element.delegate("tbody>tr", "dblclick", function () {
+            $('#grid').data("kendoGrid").editRow($(this));
+        });
+
+    }
+    $("#grid").off("click", ".k-grid-Export", common.exportrevDefaultFieldsToExcel);
+    $("#grid").on("click", ".k-grid-Export", common.exportrevDefaultFieldsToExcel);
+    $("#sapGUIDefaultFieldRefresh").click(common.loadDefaultFieldGrid);
+    var test = $('#grid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+
+    $(document).ready(function () {
+        var securityModel = common.permissionSet;
+        if (common.accountIntermediary != undefined) {
+            common.accountIntermediary = '';
+            common.accountFeeType = '';
+        }
+        if (securityModel.HasREV2SAP_INT_Access || securityModel.HasREV2SAP_EDIT_RULE_Access) {
+            if (securityModel.HasREV2SAP_EDIT_RULE_Access) {
+                $('#grid').find('.k-toolbar .k-button').prop("disabled", false);
+                $(".k-upload-button").prop("disabled", false);
+            }
+            else {
+                $('#grid').find('.k-toolbar .k-button').prop("disabled", true);
+                $(".k-upload-button").prop("disabled", true);
+            }
+        }
+        else {
+            //Select PanelBar Item..
+            var panelBar = $("#panelbar").kendoPanelBar().data("kendoPanelBar");
+            var rootItem = panelBar.element.children("li").eq(0).find(".k-group > .k-item").eq(2);
+            rootItem.find("span").trigger("click");
+        }
+
+        $("#btnFilterDefaultField").click(common.loadDefaultFieldGrid);
+//        $("#grid").off("dblclick", "tbody tr", common.openAccountDetailMap);
+//        $("#grid").on("dblclick", "tbody tr", common.openAccountDetailMap);
+    });
+    
+</script>

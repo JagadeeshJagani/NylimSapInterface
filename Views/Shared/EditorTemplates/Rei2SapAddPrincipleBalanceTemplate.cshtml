@@ -1,0 +1,67 @@
+﻿@model NylimSapInterface.Model.Rei2SapPrincipleBalance
+
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Category)
+</div>
+<div class="editor-field">
+    @(Html.Kendo().ComboBox()
+                                        .Name("Category")
+                                        .Placeholder("Select Category")
+                          .HtmlAttributes(new { style = "width:250px" })
+                          .Suggest(true)
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                            {
+                                read.Action("GetPrincipleWrtCategory", "RulesTable");
+                            });
+                    })
+            )
+</div>
+<div class="editor-label">
+    @Html.LabelFor(model => model.Participant)
+</div>
+<div class="editor-field">
+    @(Html.Kendo().ComboBox()
+                          .Name("Participant")
+                          .Placeholder("Select Participant")
+                          .HtmlAttributes(new { style = "width:250px" })
+                         .Suggest(true)
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                            {
+                                read.Action("GetPrincipleWrtParticipant", "RulesTable");
+                            });
+                    })
+            )
+</div>
+<div class="editor-label">
+    @Html.LabelFor(model => model.Portfolio)
+</div>
+<div class="editor-field">
+    @(Html.Kendo().ComboBox()
+                          .Name("Portfolio")
+                          .Placeholder("Select Portfolio")
+                          .HtmlAttributes(new { style = "width:250px" })
+                          .Suggest(true)
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                            {
+                                read.Action("GetPrincipleWrtPortfolio", "RulesTable");
+                            });
+                    })
+            )
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.PrincipalBalanceWriteDown)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.PrincipalBalanceWriteDown, new { id = "numeric", @class = "k-input "})
+    @Html.ValidationMessageFor(model => model.PrincipalBalanceWriteDown)
+</div>
+
+

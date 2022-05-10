@@ -1,0 +1,49 @@
+﻿@model NylimSapInterface.Model.gen2SapCompanyFrequency
+
+
+<div class="editor-label">
+   <label for="lblExtractCode">Extract Code</label>
+    @*@Html.LabelFor(model => model.CompanyCode)*@
+</div>
+<div class="editor-field">
+    @*@(Html.Kendo().DropDownList()
+    .Name("CompanyCode")
+    .DataTextField("CompanyCode")
+    .DataValueField("CompanyCode")
+    .OptionLabel("Please select")
+    .Enable(false)
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetExtracts", "RunInterface").Data("DnD2IACommon.getSelectedInterfaceCode");
+        });
+    }))*@
+    @Html.TextBoxFor(model => model.CompanyCode, new { id="NewExtractName", @class = "k-input"})
+    @Html.ValidationMessageFor(model => model.FrequencyIndicator)       
+</div>
+<div class="editor-label">
+    @Html.LabelFor(model => model.FrequencyIndicator)
+</div>
+<div class="editor-field">
+    @Html.TextBoxFor(model => model.FrequencyIndicator, new { @class = "k-input",@readonly=true })    
+    @Html.ValidationMessageFor(model => model.FrequencyIndicator)
+</div>
+<div class="editor-label">
+             @*  <label for="SendtoSap">Send to SAP</label>*@
+             @Html.LabelFor(model => model.SendtoSap)
+        </div>
+ <div class="editor-field">
+         @(Html.Kendo().DropDownList()
+                  .Name("SendtoSap")                  
+                  .DataTextField("SendtoSap")
+                          .DataValueField("SendtoSap")                              
+                           .DataSource(source =>
+                           {
+                               source.Read(read =>
+                               {
+                                   read.Action("GetDnD2IASendtoSap", "ReferenceData");
+                               });
+                           }))
+            @Html.ValidationMessageFor(model => model.SendtoSap)
+        </div>

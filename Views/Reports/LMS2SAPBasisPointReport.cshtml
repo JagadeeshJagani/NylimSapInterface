@@ -1,0 +1,51 @@
+﻿<div id="contentContainer">
+    <table style="height: 20px;">
+        <tr style="height: 20px;">
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="LMSReportAsOFDate" id="lmsAsOfDate">
+                    Select Asofdate:</label>
+            </td>
+            <td>
+            @(Html.Kendo().DropDownList()
+                    .Name("LMSReserveBasisHistoryReport").HtmlAttributes(new { style = "width:130px" })
+                    .DataTextField("Quarter")
+                    .DataValueField("EventDate")
+
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                    {
+                        read.Action("GetAsofdateLMSReserveHistoryBasisReport", "Reports") ;
+                    });
+            })
+           
+        )
+            </td>
+            <td>
+                 <button class="k-button" id="btnSubmit" style="width: 100px;">Submit</button>
+            </td>
+            <td>
+                <button class="k-button navbuttons" id="btnOpen">
+                    Open in new window</button>
+            </td>
+        </tr>
+    </table>
+    <div id="reportContainer" style="overflow: hidden; height: 100%">
+        <iframe id="LMS2SAPreportframe" width="100%" height="100%" frameborder="0">
+        </iframe>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnOpen").click(reports.loadLMsReserveBasisReportinNewWindow);
+        $("#btnSubmit").click(reports.loadLMsReserveBasisReport);
+        $('iframe').load(function () {
+            $('#loading').hide();
+            $('.loader').hide();
+            $('.loaderlogo').hide();
+            $.ajaxSetup({ async: true });
+        });
+
+    });
+</script>
+

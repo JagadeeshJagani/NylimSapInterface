@@ -1,0 +1,62 @@
+﻿ @(Html.Kendo().Grid<NylimSapInterface.Model.Rev2SapAccountRules>()
+        .Name("accountDetailMapGrid")
+    .Groupable()
+    .Resizable(resize => resize.Columns(true))
+    .Sortable()
+    .Events(e => e.DataBound("common.onAccountGridload"))
+    .Reorderable(reorder => reorder.Columns(true))
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Filterable(f => f.Enabled(true))
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.RuleId).Visible(false).Title("Rule Id").Width(60).Groupable(false);
+        columns.Bound(p => p.Calculation_Group).Title("Group Name").Width(60).Groupable(false);
+        columns.Bound(p => p.Subset).Title("JE Subset").Width(100).Groupable(false);
+        columns.Bound(p => p.JE_Type).Title("JE Type").Width(100).Groupable(false);
+        columns.Bound(p => p.Intermediary).Title("Intermediary").Width(80).Groupable(false);
+        columns.Bound(p => p.Fee_Type).Title("Fee Type").Width(80).Groupable(false);
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+                .Model(m =>
+                {
+                     m.Id("RuleId");
+                    m.Field(p => p.RuleId).Editable(false);
+                })
+                .Events(e => e.RequestEnd("onRev2SapRequestEnd"))
+        //.PageSize(40)
+       // .ServerOperation(false)
+             .Read(read => read.Action("GetAccountDetailRules", "RulesTable").Data("common.getAccountMapUnMapData"))
+    )
+)
+<ul id="updateMemoOtherCash" class="centerUL">
+    
+    <li style="text-align: center;" >
+        <button class="k-button" id="btnRev2SapMap" style="width:55px;" style="text-align:left;">
+            Map</button>
+         <button class="k-button" id="btnRev2SapunMap" style="width:125px;" style="text-align:left;">
+            UnMap</button>
+        <button class="k-button" id="btnRevAccountDetailCancel" style="width:50px;" style="text-align:left;">
+            Cancel</button>
+    </li>
+</ul>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnRev2SapMap").click(function () {
+            common.MapAccountDetailMap(common.rev2sapAccountItem);
+
+        });
+
+        $("#btnRev2SapunMap").click(function () {
+            common.UnMapAccountDetailMap(common.rev2sapAccountItem);
+        });
+        $("#btnRevAccountDetailCancel").click(function () {
+            $("#grid").data("kendoGrid").dataSource.read();
+            var wdialog = $("#modalRev2SapAccountWindow").data("kendoWindow");
+            wdialog.close();
+        });
+    });
+    var validator = $("#cusipDescEntry").kendoValidator().data("kendoValidator"),
+                    status = $(".status");   
+</script>

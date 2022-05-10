@@ -1,0 +1,35 @@
+﻿@model NylimSapInterface.Model.Rei2SapBasisPoints
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.GroupName)
+</div>
+<div class="editor-field">
+   @(Html.Kendo().ComboBox()
+                                       .Name("GroupName")
+                                       .Placeholder("Select GroupName")
+                          .HtmlAttributes(new { style = "width:250px" })
+                          .Suggest(true)
+                    .DataSource(source =>
+                    {
+                        source.Read(read =>
+                            {
+                                read.Action("GetReservesBasispointGroupName", "RulesTable");
+                            });
+                    })
+            )
+</div>
+<div class="editor-label">
+    @Html.LabelFor(model => model.BasisPoint)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.BasisPoint, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.BasisPoint)
+</div>
+<div class="editor-label">
+    @Html.LabelFor(model => model.DollarAmount)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.DollarAmount, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.DollarAmount)
+</div>
+

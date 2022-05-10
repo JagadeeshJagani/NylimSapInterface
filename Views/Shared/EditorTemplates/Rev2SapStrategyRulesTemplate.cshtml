@@ -1,0 +1,182 @@
+﻿@model NylimSapInterface.Model.Rev2SapStrategyRules
+
+@*
+<div class="editor-label">
+    <label for="GroupName">Calculation Group</label>
+</div>
+<div class="editor-field">
+   @(Html.Kendo().DropDownListFor(model => model.GroupName)
+                    .Name("GroupName").HtmlAttributes(new { @style = "font-size:12px" })
+                            .DataTextField("GroupName")
+                           .DataValueField("GroupName")
+                 .OptionLabel("Please Select")
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetCalculationGroup", "RunInterface");
+                    });
+                })
+            ) 
+</div>*@
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Cusip)
+</div>
+<div class="editor-field">
+@(Html.Kendo().ComboBoxFor(model => model.Cusip)
+                      .Name("Cusip")
+                      .DataTextField("Cusip")
+                      .DataValueField("Cusip")
+                      .Events(e => e.Change("common.loadTickerData").DataBound("common.cusipDataBound"))
+                      .Suggest(true)
+                      .Placeholder("Please Select")
+            .Filter("startswith")
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetRev2SapGetCusipMapping", "RulesTable") //Set the Action and Controller name
+                            .Data("common.getCusipTickerData");
+                    });
+                })
+
+    )
+    @Html.ValidationMessageFor(model => model.Cusip)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Ticker)
+</div>
+<div class="editor-field">
+    @(Html.Kendo().ComboBoxFor(model => model.Ticker)
+                              .Name("Ticker")
+            .DataTextField("Ticker")
+            .DataValueField("Ticker")
+            .Events(e => e.Change("common.loadCusipData").DataBound("common.tickerDataBound"))
+            .Placeholder("Please Select")
+            .Filter("startswith")
+                   .DataSource(source =>
+                   {
+                       source.Read(read =>
+                       {
+                           read.Action("GetRev2SapGetTickerMapping", "RulesTable").Data("common.getCusipTickerData");
+                       });
+                   })
+    )
+    @Html.ValidationMessageFor(model => model.Ticker)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Product)
+</div>
+<div class="editor-field">
+ @(Html.Kendo().ComboBoxFor(model => model.Product)
+                 .Name("Product")
+                 .DataTextField("Product")
+                 .DataValueField("Product")
+            .Filter("startswith")
+                   .DataSource(source =>
+                   {
+                       source.Read(read =>
+                       {
+                           read.Action("GetRev2SapProductStrategyRule", "RulesTable");
+                       });
+                   })
+    )
+     @*@(Html.Kendo().IntegerTextBoxFor(model => model.Product)
+      .HtmlAttributes(new { style = "width:100%" })
+      .Spinners(true)
+      .Format("#")
+          )*@
+    @Html.ValidationMessageFor(model => model.Product)
+</div>
+
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.SubProduct)
+</div>
+<div class="editor-field">
+ @(Html.Kendo().ComboBoxFor(model => model.SubProduct)
+                                        .Name("SubProduct")
+                      .DataTextField("SubProduct")
+                      .DataValueField("SubProduct")
+            .Filter("startswith")
+                   .DataSource(source =>
+                   {
+                       source.Read(read =>
+                       {
+                           read.Action("GetRev2SapSubProductStrategyRule", "RulesTable");
+                       });
+                   })
+    )
+    @Html.ValidationMessageFor(model => model.SubProduct)
+</div>
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.Category)
+</div>
+<div class="editor-field">
+    @(Html.Kendo().ComboBoxFor(model => model.Category)
+                                           .Name("Category")
+                         .DataTextField("Category")
+                         .DataValueField("Category")
+            .Filter("startswith")
+                   .DataSource(source =>
+                   {
+                       source.Read(read =>
+                       {
+                           read.Action("GetRev2SapCategoryStrategyRule", "RulesTable");
+                       });
+                   })
+    )
+    @Html.ValidationMessageFor(model => model.Category)
+</div>
+
+<div class="editor-label">
+     <label for="Profit_Center">Profit Center</label>
+</div>
+<div class="editor-field">
+ @(Html.Kendo().ComboBoxFor(model => model.Profit_Center)
+                                        .Name("Profit_Center")
+                      .DataTextField("Profit_Center")
+                      .DataValueField("Profit_Center")
+            .Filter("startswith")
+                   .DataSource(source =>
+                   {
+                       source.Read(read =>
+                       {
+                           read.Action("GetRev2SapProfitCenterStrategyRule", "RulesTable");
+                       });
+                   })
+    )
+    @Html.ValidationMessageFor(model => model.Profit_Center)
+</div>
+
+<div class="editor-label">
+<label for="Fundname">Fund Name</label>
+</div>
+<div class="editor-field">
+    @(Html.Kendo().ComboBoxFor(model => model.Fundname).HtmlAttributes(new { @style = "font-color:#000; width:100%"})
+                                      .Name("Fundname")
+                                      .Placeholder("Please Select")
+                                      .DataTextField("Fundname")
+                                      .DataValueField("Fundname")
+                                      .Enable(false)
+                                      .HighlightFirst(true)
+            .Filter("startswith")
+                   .DataSource(source =>
+                   {
+                       source.Read(read =>
+                       {
+                           read.Action("GetRev2SapGetFundNameMapping", "RulesTable").Data("common.getCusipTickerData");
+                       });
+                   })
+    )
+    @Html.ValidationMessageFor(model => model.Fundname)
+</div>
+
+
+
+
+

@@ -1,0 +1,144 @@
+﻿@{
+    ViewBag.Title = "Company Summary";
+}
+@section featured {
+}
+<script type="text/javascript">
+
+   
+    function deleteRule() {
+        var myGrid = $('#grid').data("kendoGrid");
+
+        if (myGrid.select().length == 0) {
+            alert("Select record to be removed!");
+            return false;
+        }
+        myGrid.removeRow(myGrid.select());
+    }
+    function dataBound(e) {
+        $("#grid").off("click", ".k-grid-Delete", deleteRule);
+        $("#grid").on("click", ".k-grid-Delete", deleteRule);
+    }
+    function onRequestEnd(e) {
+        var interfaceName = $("#selectinterface").data("kendoDropDownList").text();
+        if (e.type == "update" && !e.response.errors) {
+            common.showSuccessMsgSlide( interfaceName + " Company Summary Updated Successfully!");
+        }
+        if (e.type == "create" && !e.response.errors) {
+            common.showSuccessMsgSlide( interfaceName +" Company Summary Created Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read(getSelectedInterface());
+        }
+        if (e.type == "destroy" && !e.response.errors) {
+            common.showSuccessMsgSlide( interfaceName +" Company Summary Removed Successfully!");
+            $("#grid").data("kendoGrid").dataSource.read();
+        }
+    }
+    function onSave(e) {
+        if (e.model.id != e.model.CompanyCode) {
+            if (!checkDup(this, e.model.CompanyCode)) {
+                alert("CompanyCode already exists!");
+                e.preventDefault();
+            }
+        }
+    }
+    function checkDup(obj, value) {
+        var data = obj.dataSource.data();
+        var invalid = 0;
+        $(data).each(function (i, item) {
+            if (item.id == value) {
+                invalid++;
+            }
+        });
+        if (invalid > 0) {
+            return false;
+        }
+        return true;
+    }
+    function onEdit(e) {        
+        if (e.model.isNew() == false) {
+            e.container.find('#CompanyCode').prop("readonly", true);
+        }
+    }
+    function getInterfaceInfo() {
+        var interfaceName = $("#selectinterface").data("kendoDropDownList").text();
+        return { interfaceName: interfaceName };
+    }
+
+    $(document).ready(function () {
+        var interfaceName = $("#selectinterface").data("kendoDropDownList").text();
+        $('#gen2sapCS').attr('href', '@Url.Action("Gen2SapCompanySummaryToExcel", "ReferenceData")/?interfaceName=' + interfaceName);
+
+    });
+</script>
+<div id="contentContainer">
+    @(Html.Kendo().Grid<NylimSapInterface.Model.Gen2SapCompanySummary>()
+        .Name("grid")
+    .Groupable()
+    .Resizable(resize => resize.Columns(true))
+    .Scrollable(scrollable => scrollable.Virtual(true))
+    .Events(e => e.DataBound("dataBound").Save("onSave").Edit("onEdit"))
+    .Editable(e => e.Mode(GridEditMode.PopUp).TemplateName("Gen2SapCompanySummaryTemplate"))
+    .Sortable()
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Filterable(f => f.Enabled(true))
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.CompanyCode).Width(120);
+        columns.Bound(p => p.CompanyGroup).Width(120);
+        columns.Bound(p => p.SubSystemCode).Width(140);
+        columns.Bound(p => p.SAPInterfaceCode).Width(120);
+        columns.Bound(p => p.Description).Width(110);
+        columns.Bound(p => p.SendToSapAuto).Width(120);
+        columns.Bound(p => p.Maker).Hidden(true).HtmlAttributes(new { @id = "maker" });
+        columns.Bound(p => p.Checker).Hidden(true).HtmlAttributes(new { @id = "checker" });
+        columns.Bound(p => p.PoolProfitCenter).HtmlAttributes(new { @id = "PoolProfitCenter" }).Width(120);
+        columns.Bound(p => p.SapCostCenter).HtmlAttributes(new { @id = "SapCostCenter" }).Width(120);
+        columns.Bound(p => p.SapProfitCenter).HtmlAttributes(new { @id = "SapProfitCenter" }).Width(120);
+    })
+            //.ToolBar(toolbar => { 
+            //    toolbar.Create().Text("Create Company Summary");
+            //    toolbar.Custom().Text("Delete").Name("Delete").Url("#");
+            //})
+       .ToolBar(toolbar =>
+    {
+        toolbar.Template(
+            @<text> <a class="k-button k-button-icontext k-grid-add" href="/SapGuiInterface/ReferenceData/GetGen2SapCompanySummary?grid-mode=insert">
+                <span class="k-icon k-add"></span>Create Company Summary</a> <a class="k-button k-button-icontext k-grid-Delete"
+                    href="#"><span></span>Delete</a> <a id='gen2sapCS' class="k-button k-button-icontext k-grid-export" href='#'>
+                        <span></span><span class=" k-icon k-grid-export-image"/>Export </a>
+    </text>);
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+                .Model(m =>
+                {
+                    m.Id("CompanyCode");
+                })
+        .Events(e => e.RequestEnd("onRequestEnd"))
+        .Create(update => update.Action("SaveGen2SapCompanySummary", "ReferenceData").Data("getInterfaceInfo"))
+        .Update(update => update.Action("UpdateGen2SapCompanySummary", "ReferenceData").Data("getInterfaceInfo"))
+        .Destroy(destroy => destroy.Action("DeleteGen2SapCompanySummary", "ReferenceData").Data("getInterfaceInfo"))
+        .PageSize(40)
+        .ServerOperation(false)
+        .Read(read => read.Action("GetGen2SapCompanySummary", "ReferenceData").Data("getInterfaceInfo"))
+    )
+)
+</div>
+<script type="text/javascript">
+    var securityModel = common.permissionSet;
+    var interfaceName = $("#selectinterface").data("kendoDropDownList").text();
+    if (securityModel["Has" + interfaceName + "_EDIT_RULE_Access"]) {       
+        $('#grid').data("kendoGrid").element.delegate("tbody>tr", "dblclick", function () {
+            $('#grid').data("kendoGrid").editRow($(this));
+        });
+    }
+    var test = $('#grid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 300
+    }).data("kendoTooltip");
+</script>

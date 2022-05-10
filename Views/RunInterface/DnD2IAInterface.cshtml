@@ -1,0 +1,167 @@
+﻿@{
+    ViewBag.Title = "Run Interface";
+}
+@section featured {
+}
+<script type="text/javascript">
+    $('#reRun').change(function () {
+        if ($(this).is(':checked')) {
+            $("#rDnD2IADate").data("kendoDatePicker").enable(true);
+            $("#FreqIndicator").closest(".k-widget").show();
+            $("#lblfreqIndicator").show();
+            var FreqIndicatorName = $("#FreqIndicator").data("kendoDropDownList").text();
+            DnD2IACommon.rDateChange();
+        }
+        else {
+            var todayDate = kendo.toString(kendo.parseDate(new Date()), 'MM/dd/yyyy');
+            $("#rDnD2IADate").data("kendoDatePicker").value(todayDate);
+            $("#rDnD2IADate").data("kendoDatePicker").enable(false);
+            var ddl = $("#FreqIndicator").data("kendoDropDownList");
+            ddl.dataSource.data({}); // clears dataSource
+            ddl.text("-- Please Select --"); // clears visible text
+            ddl.value(""); // clears invisible value
+            $("#FreqIndicator").closest(".k-widget").hide();
+            $("#lblfreqIndicator").hide();
+        }
+    });
+
+    $(document).ready(function () {
+        if (common.permissionSet.length > 0) {
+            common.initLoad(common.permissionSet);
+        }
+    });
+</script>
+<div id="contentContainer">
+    <table style="height: 20px;">
+        <tr>
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="companycode">
+                    Select Extract:
+                </label>
+            </td>
+            <td>
+                @(Html.Kendo().DropDownList()
+               .Name("companyList").HtmlAttributes(new { style = "width:200px" })
+               .DataTextField("CompanyCode")
+               .DataValueField("CompanyName")
+               .Events(e => e.Change("DnD2IACommon.dndEventChanged").DataBound("DnD2IACommon.dndbinddataChanged"))
+               .DataSource(source =>
+                {
+                    source.Read(read =>
+                        {
+                            read.Action("GetExtracts", "RunInterface").Data("DnD2IACommon.getSelectedInterfaceCode");
+                        });
+                })
+               .CascadeFrom("selectinterface"))
+            </td>
+            <td>
+                <a class="k-button k-button-icontext k-grid-Refresh" id="sapGUIrefresh" href="#"><span />
+                    <span class=" k-icon k-i-refresh" /></a>
+            </td>
+            <td>
+                <input type="checkbox" id="reRun" name="reRun" style="display: block;" />
+            </td>
+            <td>
+                <label for="reRun" id="lblreRun" style="display: block;">
+                    reRun</label>
+            </td>
+            <td>
+                <label class="category-label" for="ReportUrl" id="lblreportdate">
+                    Select Date:</label>
+            </td>
+            <td>
+                @(Html.Kendo().DatePicker()
+              .Name("rDnD2IADate")
+              .Enable(false)
+              .Events(e => e.Change("DnD2IACommon.rDateChange"))
+              .HtmlAttributes(new { style = "width:120px;" }))
+              @*.Max(DateTime.Today))*@
+            </td>
+            <td>
+                <label for="freqIndicator" id="lblfreqIndicator" style="display: block;">
+                    Frequency</label>
+            </td>
+            <td>
+                @(Html.Kendo().DropDownList()
+                    .Name("FreqIndicator").HtmlAttributes(new { style = "width:130px" })
+                    .OptionLabel("-- Please Select --")
+                    .DataTextField("Text")
+                    .DataValueField("Value")
+                    .AutoBind(false)
+               )
+            </td>
+            <td>
+                <button value="2" class="k-button" id="btndndrunInterfaceButton" style="width: 100px;">
+                    Run Interface
+                </button>
+            </td>
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="getlatest">
+                    Get Latest:
+                </label>
+            </td>
+            <td>
+                @(Html.Kendo().DropDownList()
+                 .Name("Filter").HtmlAttributes(new { @style = "font-size:12px" })
+                 .DataTextField("Text").OptionLabel("-- Please Select --")
+                 .DataValueField("Value").AutoBind(false)
+                 .BindTo((System.Collections.IEnumerable)ViewData["Filter"])
+                 .Events(e => e.Change("common.filterChanged").DataBound("common.filterChanged"))
+            )
+            </td>
+        </tr>
+    </table>
+    @(Html.Kendo().Grid<NylimSapInterface.Model.RunStatus>()
+    .Name("grid")
+    .Groupable()
+    .Resizable(resize => resize.Columns(true))
+    .Scrollable(scrollable => scrollable.Virtual(true))
+    .Sortable()
+    .Selectable(selectable => selectable.Mode(GridSelectionMode.Single))
+    .Filterable()
+    .Columns(columns =>
+    {
+        columns.Bound(p => p.RunId).Groupable(true).Title("Run Id").Width(80);
+        columns.Bound(p => p.Frequency).Title("Frequency").ClientTemplate("#=DnD2IACommon.GetFreqNullvalue(Frequency)#").Width(110);
+        columns.Bound(p => p.RunDate).Groupable(true).Format("{0:MM/dd/yyyy HH:mm:ss}").Title("Run Date").Width(140);
+        columns.Bound(p => p.CompanyGroup).Title("Extract").Width(110);
+        columns.Bound(p => p.StartDate).Groupable(true).Format("{0:MM/dd/yyyy HH:mm:ss}").Title("Start Date").Width(140);
+        columns.Bound(p => p.EndDate).Groupable(true).Format("{0:MM/dd/yyyy HH:mm:ss}").Title("End Date").Width(140);
+        columns.Bound(p => p.Status).Title("Status").Width(120);
+        columns.Bound(p => p.Ftp2SapDone).Title("Ftp to IA").Width(100);
+        columns.Bound(p => p.AckReceived).Title("Ack Received").Width(100);
+        columns.Bound(p => p.Message).Title("Message").Width(450).HtmlAttributes(new { @style = "white-space: nowrap; text-overflow: ellipsis;", @value = "bar" });
+        columns.Bound(p => p.UserName).Title("User Name").Width(100);
+        columns.Bound(p => p.DetailFileName).Title("Detail File").Width(100).Filterable(false).ClientTemplate("<a class='gridLink' style='cursor: hand;' href='\\#' id='slpitLink'  title='Download Detail File' onclick=\"common.DownloadDND2IAFile('#:DetailFilepath#'); \">#= DetailFileName == null ? \"\" : DetailFileName #</a>");
+        columns.Bound(p => p.ControlFileName).Title("Control File").Width(100).Filterable(false).ClientTemplate("<a class='gridLink' style='cursor: hand;' href='\\#' id='slpitLink'  title='Download Control File' onclick=\"common.DownloadDND2IAFile('#:ControlFilepath#'); return false;\">#= ControlFileName == null ? \"\" : ControlFileName #</a>");
+    })
+    .DataSource(dataSource => dataSource
+        .Ajax()
+        .Batch(true)
+        .AutoSync(true)
+        .PageSize(45)
+        .ServerOperation(false)
+        .Read(read => read.Action("GetRunStatusRead", "RunInterface").Data("DnD2IACommon.getDnDSelectedCompany"))
+    )
+)
+</div>
+<script type="text/javascript">
+    var test = $('#grid').data("kendoGrid").table.kendoTooltip({
+        filter: "td[value=bar]",
+        content: function (e) {
+            var target = e.target;
+            return $(target).text();
+        },
+        position: "top",
+        width: 100
+    }).data("kendoTooltip");
+    $(document).ready(function () {
+        $("#FreqIndicator").closest(".k-widget").hide();
+        $("#lblfreqIndicator").hide();
+        var todayDate = kendo.toString(kendo.parseDate(new Date()), 'MM/dd/yyyy');
+        $("#rDnD2IADate").data("kendoDatePicker").value(todayDate);
+        var grid = $('#grid').data('kendoGrid');
+        $("#sapGUIrefresh").click(common.filterChanged);
+        $("#btndndrunInterfaceButton").click(DnD2IACommon.ondnd2iaRunInterface);
+    });
+</script>

@@ -1,0 +1,29 @@
+﻿@model NylimSapInterface.Model.FundGroupMapping
+
+<script type="text/javascript">
+
+</script>
+<div class="editor-label">
+    @Html.LabelFor(model => model.CompanyGroup)
+</div>
+<div class="editor-field">
+    @(Html.Kendo().DropDownList()
+            .Name("CompanyGroupName")
+            .DataTextField("CompanyGroupName")
+            .DataValueField("CompanyGroupName")
+    //.OptionLabel("Please select")
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetCompanyGroups", "RulesTable").Data("getSelectedInterface");
+        });
+    }))
+</div>
+<div class="editor-label">
+    @Html.LabelFor(model => model.CompanyCode)
+</div>
+<div class="editor-field">
+    @Html.EditorFor(model => model.CompanyCode, new { @class = "k-input" })
+    @Html.ValidationMessageFor(model => model.CompanyCode)
+</div>

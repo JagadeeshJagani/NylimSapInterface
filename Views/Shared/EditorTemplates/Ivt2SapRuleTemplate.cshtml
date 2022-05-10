@@ -1,0 +1,204 @@
+﻿@model NylimSapInterface.Model.Ivt2SapRules
+@Html.HiddenFor(model => model.RuleId)
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".k-edit-form-container").removeClass("k-edit-form-container");
+    });
+</script>
+<table style="padding: 1%">
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.InvestranAcct)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.InvestranAcct)
+            @Html.ValidationMessageFor(model => model.InvestranAcct)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SapCompanyCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SapCompanyCode)
+            @Html.ValidationMessageFor(model => model.SapCompanyCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.LegalEntity)
+        </td>
+        <td class="editor-field">
+            @Html.TextAreaFor(model => model.LegalEntity, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.LegalEntity)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.Vehicle)
+        </td>
+        <td class="editor-field">
+            @Html.TextAreaFor(model => model.Vehicle, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.Vehicle)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.Investor)
+        </td>
+        <td class="editor-field">
+            @Html.TextAreaFor(model => model.Investor, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.Investor)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.GlAcctNo)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.GlAcctNo)
+            @Html.ValidationMessageFor(model => model.GlAcctNo)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.GlAccountType)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.GlAccountType)
+            @Html.ValidationMessageFor(model => model.GlAccountType)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.GlAcctDescription)
+        </td>
+        <td class="editor-field">
+            @Html.TextAreaFor(model => model.GlAcctDescription, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.GlAcctDescription)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.Deal)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.Deal)
+            @Html.ValidationMessageFor(model => model.Deal)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.PartnerCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.PartnerCode)
+            @Html.ValidationMessageFor(model => model.PartnerCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.DistributionChannelCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.DistributionChannelCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.DistributionChannelCode)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.LedgerGroupCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.LedgerGroupCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.LedgerGroupCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.GLDocumentType)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.GLDocumentType, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.GLDocumentType)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.PremiumLoadType)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.PremiumLoadType, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.PremiumLoadType)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.PolicyRiderType)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.PolicyRiderType, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.PolicyRiderType)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SeparateAccountSeriesCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SeparateAccountSeriesCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.SeparateAccountSeriesCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SourceProductCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SourceProductCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.SourceProductCode)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.StateCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.StateCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.StateCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.QualifiedNonQualifiedIndicator)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.QualifiedNonQualifiedIndicator, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.QualifiedNonQualifiedIndicator)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SourceInvestmentDivisionCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SourceInvestmentDivisionCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.SourceInvestmentDivisionCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.ProductCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.ProductCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.ProductCode)
+        </td>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SubProductCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SubProductCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.SubProductCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.SAPTradingPartnerCode)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.SAPTradingPartnerCode, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.SAPTradingPartnerCode)
+        </td>
+    </tr>
+    <tr>
+        <td class="editor-label">
+            @Html.LabelFor(model => model.InvestranCommonID)
+        </td>
+        <td class="editor-field">
+            @Html.EditorFor(model => model.InvestranCommonID, new { @class = "k-input" })
+            @Html.ValidationMessageFor(model => model.InvestranCommonID)
+        </td>
+    </tr>
+
+</table>

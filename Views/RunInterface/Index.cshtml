@@ -1,0 +1,14 @@
+﻿@{
+    ViewBag.Title = "Run Interface";
+}
+@section featured {
+}
+<script type="text/javascript">
+    $(document).ready(function () {
+        $.get(base_url + 'RunInterface/Main', function (data) {
+            $("#bodyContent").empty().html(data);
+            resizeWindow();
+        });
+    });
+</script>
+

@@ -1,0 +1,171 @@
+﻿@model NylimSapInterface.Model.Rev2SapAccountRules
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.GroupName)
+</div>
+<div class="editor-field">
+  @(Html.Kendo().DropDownList()
+                   .Name("GroupName").HtmlAttributes(new { @style = "font-size:12px" })
+                                     .DataTextField("GroupName")
+                                          .DataValueField("GroupName")
+                 .OptionLabel("Please Select")
+                .DataSource(source =>
+                {
+                    source.Read(read =>
+                    {
+                        read.Action("GetCalculationGroup", "RunInterface");
+                    });
+                })
+            ) 
+</div>
+
+
+<div class="editor-label">
+    @Html.LabelFor(model => model.JESubset)
+</div>
+<div class="editor-field">
+  @(Html.Kendo().ComboBoxFor(model => model.JESubset)
+                  .Name("JESubset")
+                  .DataTextField("JESubset")
+                  .DataValueField("JESubset")
+                 .Filter("startswith")
+                   .DataSource(source =>
+                   {
+                       source.Read(read =>
+                       {
+                           read.Action("GetAllSubSets", "RunInterface");
+                       });
+                   })
+    )
+</div>
+
+<div class="editor-label">
+  <label class="category-label" for="includeIntermediary">
+                    Intermediary</label>
+</div>
+<div class="editor-field">
+@(Html.Kendo().ComboBoxFor(model => model.Intermediary)
+                .Name("Intermediary")
+                .HtmlAttributes(new { style = "width:180px" })
+                .DataTextField("Intermediary")
+                .DataValueField("Intermediary")
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetRev2SapIntermediary", "RulesTable");
+        });
+    }))
+
+    @Html.ValidationMessageFor(model => model.Intermediary)
+</div>
+
+<div class="editor-label">
+     <label class="category-label" for="includeFeeType">
+                    Fee Type</label>
+</div>
+<div class="editor-field">
+@(Html.Kendo().ComboBoxFor(model => model.Fee_Type)
+                .Name("Fee_Type")
+                .HtmlAttributes(new { style = "width:180px" })
+                .DataTextField("Fee_Type")
+                .DataValueField("Fee_Type")
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetRev2SapFeeType", "RulesTable").Data("common.getAccountMapUnMapData");
+        });
+    }))
+
+    @Html.ValidationMessageFor(model => model.Fee_Type)
+</div>
+
+@*<div class="editor-label">
+     <label class="category-label" for="excludeIntermediary">
+                    Exclude Intermediary</label>
+</div>
+<div class="editor-field">
+@(Html.Kendo().ComboBoxFor(model => model.Intermediary)
+            .Name("excludeIntermediary")
+    .HtmlAttributes(new { style = "width:180px" })
+                .DataTextField("Intermediary")
+                .DataValueField("Intermediary")
+                        .Template("<input type='checkbox' name='cb' value='#:data.Intermediary#' /> #:data.Intermediary#")
+                        .Events(e => e.Select("onExcludeIntermediarySelect").Change("common.loadExcludeFeeTypeData"))
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetRev2SapExcludeIntermediary", "RulesTable");
+        });
+    }))
+
+    @Html.ValidationMessageFor(model => model.Intermediary)
+</div>
+
+<div class="editor-label">
+   <label class="category-label" for="excludeFeeType">
+                    Exclude FeeType</label>
+</div>
+<div class="editor-field">
+@(Html.Kendo().ComboBoxFor(model => model.Fee_Type)
+                    .Name("excludeFeeType")
+    .HtmlAttributes(new { style = "width:180px" })
+                .DataTextField("Fee_Type")
+                .DataValueField("Fee_Type")
+                        .Template("<input type='checkbox' name='cb' value='#:data.Fee_Type#' /> #:data.Fee_Type#")
+        .Events(e => e.Select("onExcludeFeeTypeSelect"))
+    .DataSource(source =>
+    {
+        source.Read(read =>
+        {
+            read.Action("GetRev2SaExcludepFeeType", "RulesTable").Data("common.getExcludeFeeTypeData");
+        });
+    }))
+
+    @Html.ValidationMessageFor(model => model.Fee_Type)
+</div>*@
+
+
+<script type="text/javascript">
+//This extendes the base Widget class
+(function ($) {
+debugger;
+    var MultiSelectBox = window.kendo.ui.DropDownList.extend({
+        _select: function (li) { },//Prevents highlighting
+        _blur: function () { },//Prevents auto close
+    });
+
+    window.kendo.ui.plugin(MultiSelectBox);
+})(jQuery);
+
+//Sets up your optional label
+$(document).ready(function () {
+    $("#type_of_je").data("kendoComboBox").text("-- Select --");
+})
+
+//Does all the functionality
+function onSelect(e) {
+    var dataItem = this.dataItem(e.item);
+    var ddl = $("#type_of_je").data("kendoComboBox");
+    var cbs = document.getElementsByName("cb");
+    var display;
+
+    var list = [];
+    for (var i = 0; i < cbs.length; i++) {
+        if (cbs[i].checked) {
+            list.push(cbs[i].value);
+        }
+    }
+
+    if (list.length == 0) {
+        display = "-- Select --";
+    }
+    else {
+        display = list.join(", ");
+    }
+
+    ddl.text(display);
+}
+</script>

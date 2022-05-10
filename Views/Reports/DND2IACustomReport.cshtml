@@ -1,0 +1,105 @@
+﻿<div id="contentContainer">
+    <table style="height: 20px;">
+        <tr style="height: 20px;">
+            <td style="padding-left: 3px;">
+                <label class="category-label" for="ReportUrl" id='lmsreport'>
+                    Select Report:</label>
+            </td>
+            <td>@(Html.Kendo().DropDownList()
+            .Name("DND2IAReport").HtmlAttributes(new { style = "width:160px" })
+            .DataTextField("ReportName")
+            .DataValueField("ReportUrl")
+            .Events(e => e.Change("reports.onDND2IAReportChange"))
+            .OptionLabel("Select Report")
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                    {
+                        read.Action("GetDND2IACustomReports", "Reports");
+                    });
+            })
+            )
+            </td>
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="extractcode" id="lblextractcode">
+                    Select Extract Code:</label>
+            </td>
+            <td>
+                @(Html.Kendo().DropDownList()
+                    .Name("dndcompanyList").HtmlAttributes(new { style = "width:80px;" })
+            .DataTextField("CompanyCode")
+            .DataValueField("CompanyCode")
+                    .Events(e => e.Change("reports.onDND2IAReportChange"))
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                    {
+                        read.Action("GetExtracts", "RunInterface").Data("DnD2IACommon.getSelectedInterfaceCode");
+                    });
+            })
+            .CascadeFrom("selectinterface")
+        )
+            </td>
+            <td>
+                <label class="category-label" for="ReportUrl" id="lblreportdate">
+                    Select Date:</label>
+            </td>
+            <td>
+                @(Html.Kendo().DatePicker()
+              .Name("rDND2IAReportDate")
+              .HtmlAttributes(new { style = "width:120px;" })
+                )
+            </td>
+            <td style="padding-left: 5px;">
+                <label class="category-label" for="DNDReportAsOFDate" id="dndAsOfDate">
+                    Select Asofdate:</label>
+            </td>
+            <td>
+                @(Html.Kendo().DropDownList()
+            .Name("DND2IAReportAsOFDate").HtmlAttributes(new { style = "width:130px" })
+
+                                    .DataTextField("EventDate")
+                                    .DataValueField("RecrunId")
+            .DataSource(source =>
+            {
+                source.Read(read =>
+                    {
+                        read.Action("GetAsofdateDNDreport", "Reports");// .Data("Report.getbySelectedExtractCode");
+                    });
+            })
+
+        )
+            </td>
+            <td>
+                <button class="k-button" id="btnSubmit" style="width: 100px;">
+                    Submit</button>
+            </td>
+            <td>
+                <button class="k-button navbuttons" id="btnOpen">
+                    Open in new window</button>
+            </td>
+        </tr>
+    </table>
+    <div id="reportContainer" style="overflow: hidden; height: 100%">
+        <iframe id="DND2IAreportframe" width="100%" height="100%" frameborder="0"></iframe>
+    </div>
+</div>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#btnOpen").click(reports.loadDND2IAReportinNewWindow);
+        $("#btnSubmit").click(reports.loadDND2IAReport);
+        $("#dndcompanyList").closest(".k-widget").hide();
+        $("#lblextractcode").hide();
+        $("#DND2IAReportAsOFDate").closest(".k-widget").hide();
+        $("#dndAsOfDate").hide();
+        $("#rDND2IAReportDate").closest(".k-widget").hide();
+        $("#lblreportdate").hide();
+        $('iframe').load(function () {
+            $('#loading').hide();
+            $('.loader').hide();
+            $('.loaderlogo').hide();
+            $.ajaxSetup({ async: true });
+        });
+
+    });
+</script>
